@@ -13,25 +13,6 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_21
 }
 
-dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springframework.boot:spring-boot-starter-amqp")
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-	implementation("org.springframework.boot:spring-boot-starter-data-redis")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	compileOnly("org.projectlombok:lombok")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework.boot:spring-boot-testcontainers")
-	testImplementation("org.springframework.amqp:spring-rabbit-test")
-	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-	testImplementation("org.testcontainers:junit-jupiter")
-	testImplementation("org.testcontainers:mongodb")
-	testImplementation("org.testcontainers:rabbitmq")
-}
-
 configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
@@ -74,19 +55,7 @@ subprojects {
 	apply(plugin = "io.spring.dependency-management")
 	apply(plugin = "org.asciidoctor.jvm.convert")
 	apply(plugin = "java")
-}
 
-project(":eagle-film-common") {
-}
-
-project(":eagle-film-api") {
-	dependencies {
-		implementation(project(":eagle-film-common"))
-	}
-}
-
-project(":eagle-film-consumer") {
-	dependencies {
-		implementation(project(":eagle-film-common"))
-	}
+	group = "org.gdsc.yonsei"
+	version = "0.0.1-SNAPSHOT"
 }
