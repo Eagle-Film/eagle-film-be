@@ -3,7 +3,7 @@ package org.gdsc.yonsei.eagleflim.common.model
 import org.gdsc.yonsei.eagleflim.common.model.type.ImageStatus
 import java.time.LocalDateTime
 
-data class Photo(
+data class PhotoInfo(
 	val imageId: Long,
 	val requestId: Long,
 	val userId: Long,

@@ -6,8 +6,8 @@ import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
 @ComponentScan(basePackages = ["org.gdsc.yonsei.eagleflim.common"])
-open class Application
+open class ApiApplication
 
 fun main(args: Array<String>) {
-	runApplication<Application>(*args)
+	runApplication<ApiApplication>(*args)
 }

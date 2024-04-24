@@ -3,10 +3,10 @@ package org.gdsc.yonsei.eagleflim.common.model
 import org.gdsc.yonsei.eagleflim.common.model.type.RequestStatus
 import java.time.LocalDateTime
 
-data class User(
-	val userId: String,
-	val userName: String,
+data class PhotoRequestInfo(
+	val requestId: Long,
+	val userId: Long,
 	val requestStatus: RequestStatus,
 	val createYmdt: LocalDateTime,
-	val requestYmdt: LocalDateTime
+	val updateYmdt: LocalDateTime
 )
