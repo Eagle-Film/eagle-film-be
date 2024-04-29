@@ -9,11 +9,11 @@ import java.time.LocalDateTime
 
 @Document(collection = "user")
 data class User(
-	@Id val userId: ObjectId,
+	@Id val userId: ObjectId = ObjectId(),
 	val userName: String,
-	val requestStatus: RequestStatus,
+	val requestStatus: RequestStatus = RequestStatus.NOT_REQUESTED,
 	val oauthProvider: OAuthProvider,
 	val oauthIdentifier: String,
 	val createYmdt: LocalDateTime = LocalDateTime.now(),
-	val requestYmdt: LocalDateTime
+	val requestYmdt: LocalDateTime? = null,
 )

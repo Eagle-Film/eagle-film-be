@@ -8,5 +8,5 @@ data class UserInfo(
 	val userName: String,
 	val requestStatus: RequestStatus,
 	val createYmdt: LocalDateTime,
-	val requestYmdt: LocalDateTime
+	val requestYmdt: LocalDateTime?
 )
