@@ -8,10 +8,10 @@ import java.time.LocalDateTime
 
 @Document(collection = "PhotoRequest")
 data class PhotoRequest(
-	@Id val requestId: ObjectId,
-	val userId: ObjectId,
+	@Id val requestId: String = ObjectId.get().toHexString(),
+	val userId: String,
 	val requestStatus: RequestStatus,
-	val photoList: List<ObjectId>,
+	val photoList: List<String>,
 	val createYmdt: LocalDateTime = LocalDateTime.now(),
 	val updateYmdt: LocalDateTime = LocalDateTime.now()
 )
