@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 @Document(collection = "user")
 data class User(
-	@Id val userId: ObjectId = ObjectId(),
+	@Id val userId: String = ObjectId.get().toHexString(),
 	val userName: String,
 	val requestStatus: RequestStatus = RequestStatus.NOT_REQUESTED,
 	val oauthProvider: OAuthProvider,

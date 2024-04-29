@@ -33,7 +33,7 @@ class JwtInterceptor(
 			return false
 		}
 
-		request.setAttribute("id", result.userId.toHexString())
+		request.setAttribute("id", result.userId)
 		return true
 	}
 }
