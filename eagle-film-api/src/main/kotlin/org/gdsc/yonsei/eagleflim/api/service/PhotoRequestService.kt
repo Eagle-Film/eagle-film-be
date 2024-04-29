@@ -8,6 +8,7 @@ import org.gdsc.yonsei.eagleflim.common.model.PhotoRequestInfo
 import org.gdsc.yonsei.eagleflim.common.model.UserInfo
 import org.gdsc.yonsei.eagleflim.common.model.factory.PhotoRequestInfoFactory
 import org.gdsc.yonsei.eagleflim.common.model.type.ImageProcessType
+import org.gdsc.yonsei.eagleflim.common.model.type.ImageStatus
 import org.gdsc.yonsei.eagleflim.common.model.type.RequestStatus
 import org.springframework.stereotype.Service
 
@@ -17,7 +18,7 @@ class PhotoRequestService(
 	private val photoRepository: PhotoRepository
 ) {
 	fun createRequest(userInfo: UserInfo, imageList: List<String>, imageProcessType: ImageProcessType) {
-		val searchPhotoList = photoRepository.findByPhotoIdListAndStatus(userInfo.userId, imageList)
+		val searchPhotoList = photoRepository.findByPhotoIdListAndStatus(userInfo.userId, imageList, imageStatus = ImageStatus.UPLOADED)
 		if (searchPhotoList.size != imageList.size) {
 			throw ErrorCd.INVALID_PARAMETER.serviceException("contain invalid image")
 		}

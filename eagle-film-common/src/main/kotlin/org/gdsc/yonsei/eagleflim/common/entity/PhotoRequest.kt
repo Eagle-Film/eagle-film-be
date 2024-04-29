@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
-@Document(collection = "PhotoRequest")
+@Document(collection = "photoRequest")
 data class PhotoRequest(
 	@Id val requestId: String = ObjectId.get().toHexString(),
 	val userId: String,

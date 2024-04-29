@@ -28,8 +28,14 @@ class PhotoRequestController(private val photoRequestService: PhotoRequestServic
 		return photoRequestService.getSingleRequest(userInfo, requestId)
 	}
 
+	@GetMapping("/check")
+	fun checkRecent(@EagleUser userInfo: UserInfo): PhotoRequestStatusResponse {
+		val result = photoRequestService.getSingleRequest(userInfo, null)
+		return PhotoRequestStatusResponse(result.requestStatus)
+	}
+
 	@GetMapping("/check/{requestId}")
-	fun check(@EagleUser userInfo: UserInfo, @PathVariable(required = false) requestId: String?): PhotoRequestStatusResponse {
+	fun check(@EagleUser userInfo: UserInfo, @PathVariable requestId: String?): PhotoRequestStatusResponse {
 		val result = photoRequestService.getSingleRequest(userInfo, requestId)
 		return PhotoRequestStatusResponse(result.requestStatus)
 	}
