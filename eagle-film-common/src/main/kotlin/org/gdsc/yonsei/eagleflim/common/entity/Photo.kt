@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 data class Photo(
 	@Id val photoId: String = ObjectId.get().toHexString(),
 	val userId: String,
-	val photoLocation: String? = null,
+	val imageUrl: String? = null,
 	val imageStatus: ImageStatus = ImageStatus.NOT_UPLOADED,
 	val createYmdt: LocalDateTime = LocalDateTime.now(),
 )

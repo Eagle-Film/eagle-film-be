@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
@@ -18,7 +17,7 @@ import java.nio.file.StandardCopyOption
  */
 @Component
 class DiskFileHelper(@Value("\${file.dir}") val location: String): AbstractFileHelper {
-	override fun uploadFile(fileName: String, multipartFile: MultipartFile): Path {
+	override fun uploadFile(fileName: String, multipartFile: MultipartFile): String {
 		val totalPath = Paths.get(location + File.separator + StringUtils.cleanPath(fileName))
 		try {
 			Files.copy(multipartFile.inputStream, totalPath, StandardCopyOption.REPLACE_EXISTING)
@@ -26,10 +25,6 @@ class DiskFileHelper(@Value("\${file.dir}") val location: String): AbstractFileH
 			throw ErrorCd.SERVER_ERROR.serviceException("image upload failed")
 		}
 
-		return totalPath
-	}
-
-	override fun downloadFile(url: String) {
-		TODO("Not yet implemented")
+		return totalPath.toString()
 	}
 }

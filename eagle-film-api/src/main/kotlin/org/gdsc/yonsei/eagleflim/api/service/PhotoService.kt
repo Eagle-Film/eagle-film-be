@@ -1,7 +1,7 @@
 package org.gdsc.yonsei.eagleflim.api.service
 
 import org.gdsc.yonsei.eagleflim.api.exception.ErrorCd
-import org.gdsc.yonsei.eagleflim.api.infra.DiskFileHelper
+import org.gdsc.yonsei.eagleflim.api.infra.BucketFileHelper
 import org.gdsc.yonsei.eagleflim.api.repository.PhotoRepository
 import org.gdsc.yonsei.eagleflim.common.entity.Photo
 import org.gdsc.yonsei.eagleflim.common.model.PhotoInfo
@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile
 @Service
 class PhotoService(
 	private val photoRepository: PhotoRepository,
-	private val fileHelper: DiskFileHelper
+	private val fileHelper: BucketFileHelper
 ) {
 	fun createPhoto(userInfo: UserInfo): Photo {
 		val photoCount = photoRepository.imageCount(userInfo.userId)

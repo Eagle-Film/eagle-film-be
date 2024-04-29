@@ -5,6 +5,6 @@ import org.gdsc.yonsei.eagleflim.common.model.PhotoInfo
 
 object PhotoInfoFactory {
 	fun ofEntry(photo: Photo): PhotoInfo {
-		return PhotoInfo(photo.photoId, null, photo.userId, photo.photoLocation, photo.imageStatus, photo.createYmdt)
+		return PhotoInfo(photo.photoId, null, photo.userId, photo.imageUrl, photo.imageStatus, photo.createYmdt)
 	}
 }
