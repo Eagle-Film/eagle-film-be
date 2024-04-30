@@ -27,7 +27,7 @@ class BucketFileHelper(
 		try {
 			amazonS3.putObject(objectRequest)
 		} catch (e: Exception) {
-			throw ErrorCd.SERVER_ERROR.serviceException("file upload failed")
+			throw ErrorCd.INTERNAL_SERVER_ERROR.serviceException("file upload failed")
 		}
 
 		return "${baseUrl}/${bucket}/${objectRequest.key}"

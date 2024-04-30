@@ -5,9 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.gdsc.yonsei.eagleflim.api.auth.JWTUtil
 import org.gdsc.yonsei.eagleflim.api.exception.ErrorCd
-import org.gdsc.yonsei.eagleflim.api.exception.ServiceException
 import org.gdsc.yonsei.eagleflim.api.repository.UserRepository
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 
@@ -26,12 +24,7 @@ class JwtInterceptor(
 		val userIdFromToken = JWTUtil.getUserIdFromToken(accessToken)
 
 		val result = userRepository.getUser(userIdFromToken)
-		result ?: run {
-			val exception = ServiceException(ErrorCd.UNAUTHORIZED, "Unauthorized")
-			response.status = HttpStatus.UNAUTHORIZED.value()
-			response.writer.write(objectMapper.writeValueAsString(exception))
-			return false
-		}
+		result ?: throw ErrorCd.UNAUTHORIZED.serviceException("Unauthorized")
 
 		request.setAttribute("id", result.userId)
 		return true

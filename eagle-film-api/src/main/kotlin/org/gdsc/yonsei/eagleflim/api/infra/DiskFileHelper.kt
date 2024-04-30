@@ -22,7 +22,7 @@ class DiskFileHelper(@Value("\${file.dir}") val location: String): AbstractFileH
 		try {
 			Files.copy(multipartFile.inputStream, totalPath, StandardCopyOption.REPLACE_EXISTING)
 		} catch (e: IOException) {
-			throw ErrorCd.SERVER_ERROR.serviceException("image upload failed")
+			throw ErrorCd.INTERNAL_SERVER_ERROR.serviceException("image upload failed")
 		}
 
 		return totalPath.toString()

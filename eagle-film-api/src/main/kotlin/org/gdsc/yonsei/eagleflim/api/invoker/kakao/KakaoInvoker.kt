@@ -26,12 +26,12 @@ class KakaoInvoker(
 		}
 
 		val result = invoke(KakaoCommand.REQUEST_TOKEN, null, param, object: ParameterizedTypeReference<KakaoOAuthToken>() {})
-		return result ?: throw ServiceException(ErrorCd.SERVER_ERROR, "response is null")
+		return result ?: throw ServiceException(ErrorCd.INTERNAL_SERVER_ERROR, "response is null")
 	}
 
 	fun getUserInfo(token: String): KakaoUserInfo {
 		val result = invoke(KakaoCommand.USER_INFO, token, null, object: ParameterizedTypeReference<KakaoUserInfo>() {})
-		return result ?: throw ServiceException(ErrorCd.SERVER_ERROR, "response is null")
+		return result ?: throw ServiceException(ErrorCd.INTERNAL_SERVER_ERROR, "response is null")
 	}
 
 	fun <T> invoke(kakaoCommand: KakaoCommand, header: String?, param: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {

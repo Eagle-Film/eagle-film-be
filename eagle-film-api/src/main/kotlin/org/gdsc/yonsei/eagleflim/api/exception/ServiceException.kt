@@ -1,3 +1,7 @@
 package org.gdsc.yonsei.eagleflim.api.exception
 
-class ServiceException(private val errorCode: ErrorCd, override val message: String = errorCode.message) : RuntimeException()
+class ServiceException(
+	val errorCode: ErrorCd,
+	override val message: String = errorCode.message,
+	val debugMessage: String = ""
+) : RuntimeException()
