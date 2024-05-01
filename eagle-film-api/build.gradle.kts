@@ -38,3 +38,6 @@ tasks.test {
 kotlin {
     jvmToolchain(21)
 }
+
+val jar: Jar by tasks
+jar.enabled = false

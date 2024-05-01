@@ -13,11 +13,9 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
-val jar: Jar by tasks
 val bootJar: BootJar by tasks
 
-bootJar.enabled = true
-jar.enabled = true
+bootJar.enabled = false
 
 tasks.test {
     useJUnitPlatform()
