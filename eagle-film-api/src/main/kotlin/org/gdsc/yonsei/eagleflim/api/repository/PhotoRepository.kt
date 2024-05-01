@@ -21,9 +21,8 @@ class PhotoRepository(val mongoTemplate: MongoTemplate) {
 		return mongoTemplate.findOne(Query.query(criteria), Photo::class.java)
 	}
 
-	fun findByPhotoIdListAndStatus(userId: String, photoIdList: List<String>, imageStatus: ImageStatus = ImageStatus.PROCESSED): List<Photo> {
+	fun findByPhotoIdList(userId: String, photoIdList: List<String>): List<Photo> {
 		val criteria = Criteria.where("userId").`is`(userId)
-			.and("imageStatus").`is`(imageStatus)
 			.and("_id").`in`(photoIdList)
 		return mongoTemplate.find(query(criteria), Photo::class.java)
 	}

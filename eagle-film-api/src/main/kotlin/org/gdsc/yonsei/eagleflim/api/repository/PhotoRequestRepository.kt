@@ -20,6 +20,17 @@ class PhotoRequestRepository(private val mongoTemplate: MongoTemplate) {
 		return mongoTemplate.find(Query.query(criteria), PhotoRequest::class.java)
 	}
 
+	fun findByUserIdWithSize(userId: String, size: Int, lastRequestId: String?): List<PhotoRequest> {
+		var criteria = Criteria.where("userId").`is`(userId)
+		val sortCriteria = Sort.by("_id")
+
+		if (lastRequestId != null) {
+			criteria = criteria.and("lastRequestId").gte(lastRequestId)
+		}
+
+		return mongoTemplate.find(Query.query(criteria).with(sortCriteria).limit(size), PhotoRequest::class.java)
+	}
+
 	fun findRecentByUserId(userId: String): PhotoRequest? {
 		val criteria = Criteria.where("userId").`is`(userId)
 		val query = Query.query(criteria)
@@ -33,6 +44,11 @@ class PhotoRequestRepository(private val mongoTemplate: MongoTemplate) {
 			.and("_id").`is`(requestId)
 
 		return mongoTemplate.findOne(Query.query(criteria), PhotoRequest::class.java)
+	}
+
+	fun countByUserId(userId: String): Long {
+		val criteria = Criteria.where("userId").`is`(userId)
+		return mongoTemplate.count(Query.query(criteria), Long::class.java)
 	}
 
 	fun updateStatus(photoRequestId: String, requestStatus: RequestStatus) {

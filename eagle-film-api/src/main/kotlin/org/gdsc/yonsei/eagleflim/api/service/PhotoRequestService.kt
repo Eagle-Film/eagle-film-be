@@ -17,11 +17,12 @@ class PhotoRequestService(
 	private val photoRequestRepository: PhotoRequestRepository,
 	private val photoRepository: PhotoRepository
 ) {
+	/**
+	 * 이미지 처리 요청을 생성한다.
+	 */
 	fun createRequest(userInfo: UserInfo, imageList: List<String>, imageProcessType: ImageProcessType) {
-		val searchPhotoList = photoRepository.findByPhotoIdListAndStatus(userInfo.userId, imageList, imageStatus = ImageStatus.UPLOADED)
-		if (searchPhotoList.size != imageList.size) {
-			throw ErrorCd.INVALID_PARAMETER.serviceException("contain invalid image")
-		}
+		validateRequest(userInfo.userId)
+		validateImage(userInfo.userId, imageList)
 
 		photoRequestRepository.create(PhotoRequest(userId = userInfo.userId, processType = imageProcessType, photoList = imageList))
 		// TODO: Request Queue에 삽입 - 추후 논의
@@ -39,11 +40,46 @@ class PhotoRequestService(
 
 		return request?.let {
 			PhotoRequestInfoFactory.ofEntry(it)
-		} ?: throw ErrorCd.INVALID_PARAMETER.serviceException("not exist request")
+		} ?: throw ErrorCd.NOT_EXIST_REQUEST.serviceException("not exist request")
 	}
 
-	fun getRequestList(userInfo: UserInfo): List<PhotoRequestInfo> {
-		return photoRequestRepository.findAllByUserId(userInfo.userId)
+	fun getRequestList(userInfo: UserInfo, size: Int, pageToken: String?): List<PhotoRequestInfo> {
+		return photoRequestRepository.findByUserIdWithSize(userInfo.userId, size, pageToken)
 			.map { PhotoRequestInfoFactory.ofEntry(it) }
+	}
+
+	private fun validateRequest(userId: String) {
+		val photoRequestList = photoRequestRepository.findAllByUserId(userId)
+		if (photoRequestList.size >= REQUEST_LIMIT) {
+			throw ErrorCd.REQUEST_LIMIT_EXCEED.serviceException()
+		}
+
+		photoRequestList.forEach {
+			if (it.requestStatus == RequestStatus.PROCESSING) {
+				throw ErrorCd.REQUEST_ALREADY_EXISTS.serviceException()
+			}
+		}
+	}
+
+	private fun validateImage(userId: String, imageList: List<String>) {
+		if (imageList.size > IMAGE_LIMIT) {
+			throw ErrorCd.IMAGE_LIMIT_EXCEED.serviceException()
+		}
+
+		val searchPhotoList = photoRepository.findByPhotoIdList(userId, imageList)
+		if (searchPhotoList.size != imageList.size) {
+			throw ErrorCd.NOT_EXIST_IMAGE.serviceException()
+		}
+
+		searchPhotoList.forEach {
+			if (it.imageStatus != ImageStatus.UPLOADED) {
+				throw ErrorCd.NOT_UPLOADED_IMAGE.serviceException()
+			}
+		}
+	}
+
+	companion object {
+		const val REQUEST_LIMIT = 5 // TODO: 추후 논의 필요
+		const val IMAGE_LIMIT = 10 // TODO: 추후 논의 필요
 	}
 }

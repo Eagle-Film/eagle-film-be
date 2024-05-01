@@ -19,8 +19,8 @@ class PhotoRequestController(private val photoRequestService: PhotoRequestServic
 	}
 
 	@GetMapping
-	fun getList(@EagleUser userInfo: UserInfo): List<PhotoRequestInfo> {
-		return photoRequestService.getRequestList(userInfo)
+	fun getList(@EagleUser userInfo: UserInfo, @RequestParam size: Int = 10, @RequestParam pageToken: String? = null): List<PhotoRequestInfo> {
+		return photoRequestService.getRequestList(userInfo, size, pageToken)
 	}
 
 	@GetMapping("/{requestId}")
