@@ -30,7 +30,7 @@ class PhotoService(
 	fun uploadPhoto(userInfo: UserInfo, photoId: String, multipartFile: MultipartFile) {
 		val photo = photoRepository.getPhoto(userInfo.userId, photoId) ?: throw ErrorCd.NOT_EXIST_IMAGE.serviceException("not exist image")
 		if (photo.imageStatus != ImageStatus.NOT_UPLOADED) {
-			throw ErrorCd.INVALID_PARAMETER.serviceException("image already uploaded")
+			throw ErrorCd.ALREADY_UPLOADED.serviceException("image already uploaded")
 		}
 
 		val path = fileHelper.uploadFile(photoId, multipartFile)
