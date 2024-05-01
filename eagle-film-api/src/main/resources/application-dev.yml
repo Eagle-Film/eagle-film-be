@@ -1,6 +1,6 @@
 spring:
     rabbitmq:
-        host: dev.eagle-flim.vsfe.me
+        host: dev.eagle-film.vsfe.me
         port: 5672
     servlet:
         multipart:
@@ -9,12 +9,12 @@ spring:
 
 
 mongodb:
-    connectionString: mongodb://dev.eagle-flim.vsfe.me:27017/eagle-flim
+    connectionString: mongodb://dev.eagle-film.vsfe.me:27017/eagle-flim
 
 oauth:
     kakao:
         clientCode: 16eacb1188b754a5da7af414528a9d08
-        redirectUri: http://localhost:8080/api/v1/user/login/kakao
+        redirectUri: http://dev.eagle-film.vsfe.me:8080/api/v1/user/login/kakao
 
 cloud:
     aws:
@@ -23,7 +23,7 @@ cloud:
         credentials:
             access-key: Zu0qI1feJYNCQ5Vicjmu
             secret-key: df80kKN99LqMPkwK04o6BbPnxe35tkKLLchl6Ou0
-            bucket: eagle-flim-dev
+            bucket: eagle-film-dev
         region:
             static: ap-southeast-2
             auto: false
