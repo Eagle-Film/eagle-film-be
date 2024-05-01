@@ -9,7 +9,7 @@ spring:
 
 
 mongodb:
-    connectionString: mongodb://dev.eagle-film.vsfe.me:27017/eagle-flim
+    connectionString: mongodb://dev.eagle-film.vsfe.me:27017/eagle-film
 
 oauth:
     kakao:
