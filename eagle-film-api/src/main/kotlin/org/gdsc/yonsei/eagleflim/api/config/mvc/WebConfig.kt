@@ -34,7 +34,7 @@ open class WebConfig(
 	override fun addCorsMappings(registry: CorsRegistry) {
 		// TODO: 개발 과정에서만 전체 해제. 이후에는 CORS 예외 규칙을 완전히 제거함.
 		registry.addMapping("/**")
-			.allowedOrigins("*")
+			.allowedOriginPatterns("*")
 			.allowedMethods("GET", "POST", "PUT", "DELETE")
 			.allowCredentials(true)
 			.maxAge(3600L)
