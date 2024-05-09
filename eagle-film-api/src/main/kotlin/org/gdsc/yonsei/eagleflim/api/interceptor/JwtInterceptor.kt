@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.gdsc.yonsei.eagleflim.api.auth.JWTUtil
 import org.gdsc.yonsei.eagleflim.api.exception.ErrorCd
 import org.gdsc.yonsei.eagleflim.api.repository.UserRepository
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 
@@ -15,8 +16,12 @@ class JwtInterceptor(
 	val objectMapper: ObjectMapper
 ) : HandlerInterceptor {
 	override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+		if (HttpMethod.OPTIONS.matches(request.method)) {
+			return true
+		}
+
 		val totalToken = request.getHeader("Authorization")
-		if (totalToken == null || !totalToken.startsWith("Bearer ")) {
+		if (totalToken.isNullOrEmpty() || !totalToken.startsWith("Bearer ")) {
 			error("Invalid Token")
 		}
 
