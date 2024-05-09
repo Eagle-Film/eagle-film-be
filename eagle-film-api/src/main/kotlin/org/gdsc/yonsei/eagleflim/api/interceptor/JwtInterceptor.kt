@@ -16,7 +16,7 @@ class JwtInterceptor(
 ) : HandlerInterceptor {
 	override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
 		val totalToken = request.getHeader("Authorization")
-		if (!totalToken.startsWith("Bearer ")) {
+		if (totalToken == null || !totalToken.startsWith("Bearer ")) {
 			error("Invalid Token")
 		}
 

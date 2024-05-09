@@ -35,7 +35,7 @@ open class WebConfig(
 		// TODO: 개발 과정에서만 전체 해제. 이후에는 CORS 예외 규칙을 완전히 제거함.
 		registry.addMapping("/**")
 			.allowedOriginPatterns("*")
-			.allowedMethods("GET", "POST", "PUT", "DELETE")
+			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 			.allowCredentials(true)
 			.maxAge(3600L)
 	}
