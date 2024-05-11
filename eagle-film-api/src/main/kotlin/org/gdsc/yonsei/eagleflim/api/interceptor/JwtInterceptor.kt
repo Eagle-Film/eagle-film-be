@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletResponse
 import org.gdsc.yonsei.eagleflim.api.auth.JWTUtil
 import org.gdsc.yonsei.eagleflim.api.exception.ErrorCd
 import org.gdsc.yonsei.eagleflim.api.repository.UserRepository
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
@@ -25,14 +27,24 @@ class JwtInterceptor(
 			response.status = 403
 			return false
 		}
+		logger.info("Authorization Header: {}", totalToken)
 
-		val accessToken = totalToken.substringAfter("Bearer ")
-		val userIdFromToken = JWTUtil.getUserIdFromToken(accessToken)
+		try {
+			val accessToken = totalToken.substringAfter("Bearer ")
+			val userIdFromToken = JWTUtil.getUserIdFromToken(accessToken)
 
-		val result = userRepository.getUser(userIdFromToken)
-		result ?: throw ErrorCd.UNAUTHORIZED.serviceException("Unauthorized")
+			val result = userRepository.getUser(userIdFromToken)
+			result ?: throw ErrorCd.UNAUTHORIZED.serviceException("Unauthorized")
 
-		request.setAttribute("id", result.userId)
-		return true
+			request.setAttribute("id", result.userId)
+			return true
+		} catch (e: Exception) {
+			response.status = 403
+			return false
+		}
+	}
+
+	companion object {
+		val logger: Logger = LoggerFactory.getLogger(JwtInterceptor::class.java)
 	}
 }
