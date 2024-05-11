@@ -22,7 +22,8 @@ class JwtInterceptor(
 
 		val totalToken = request.getHeader("Authorization")
 		if (totalToken.isNullOrEmpty() || !totalToken.startsWith("Bearer ")) {
-			error("Invalid Token")
+			response.status = 403
+			return false
 		}
 
 		val accessToken = totalToken.substringAfter("Bearer ")
