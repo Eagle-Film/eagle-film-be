@@ -79,7 +79,7 @@ class PhotoRequestService(
 	}
 
 	companion object {
-		const val REQUEST_LIMIT = 5 // TODO: 추후 논의 필요
-		const val IMAGE_LIMIT = 10 // TODO: 추후 논의 필요
+		const val REQUEST_LIMIT = 500 // TODO: 추후 논의 필요
+		const val IMAGE_LIMIT = 100 // TODO: 추후 논의 필요
 	}
 }

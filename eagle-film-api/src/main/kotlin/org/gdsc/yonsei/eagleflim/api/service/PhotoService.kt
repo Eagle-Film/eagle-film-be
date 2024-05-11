@@ -43,6 +43,6 @@ class PhotoService(
 	}
 
 	companion object {
-		const val MAX_PHOTO_LIMIT = 5
+		const val MAX_PHOTO_LIMIT = 500
 	}
 }
