@@ -6,4 +6,4 @@ class HttpInvokerException(
 	status: HttpStatusCode,
 	url: String,
 	params: Map<String, Any>? = null
-): RuntimeException()
+): RuntimeException("Http Invoker Failed - status: $status, url: $url, params: $params")
