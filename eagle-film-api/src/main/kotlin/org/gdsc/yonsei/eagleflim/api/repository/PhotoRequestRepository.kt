@@ -7,10 +7,14 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 
 @Component
-class PhotoRequestRepository(private val mongoTemplate: MongoTemplate) {
+class PhotoRequestRepository(
+	private val mongoTemplate: MongoTemplate,
+	private val redisTemplate: RedisTemplate<String, String>
+) {
 	fun create(photoRequest: PhotoRequest) {
 		mongoTemplate.insert(photoRequest)
 	}
@@ -56,5 +60,9 @@ class PhotoRequestRepository(private val mongoTemplate: MongoTemplate) {
 		val update = Update.update("requestStatus", requestStatus)
 
 		mongoTemplate.findAndModify(Query.query(criteria), update, PhotoRequest::class.java)
+	}
+
+	fun submitRequest(requestId: String) {
+		redisTemplate.opsForSet().add("request", requestId)
 	}
 }
