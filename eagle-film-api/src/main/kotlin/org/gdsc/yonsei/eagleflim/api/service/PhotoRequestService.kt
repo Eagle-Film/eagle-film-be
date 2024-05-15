@@ -24,8 +24,9 @@ class PhotoRequestService(
 		validateRequest(userInfo.userId)
 		validateImage(userInfo.userId, imageList)
 
-		photoRequestRepository.create(PhotoRequest(userId = userInfo.userId, processType = imageProcessType, photoList = imageList))
-		// TODO: Request Queue에 삽입 - 추후 논의
+		val photoRequest = PhotoRequest(userId = userInfo.userId, processType = imageProcessType, photoList = imageList)
+		photoRequestRepository.create(photoRequest)
+		photoRequestRepository.submitRequest(photoRequest.requestId)
 	}
 
 	// TODO: 사용자가 요청하는 것은 불가능함 - 서버 요청에 의해서만 접근할 수 있도록 해야 함
