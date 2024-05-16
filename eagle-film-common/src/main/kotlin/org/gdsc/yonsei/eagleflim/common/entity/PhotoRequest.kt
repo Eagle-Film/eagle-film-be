@@ -11,9 +11,9 @@ import java.time.LocalDateTime
 data class PhotoRequest(
 	@Id val requestId: String = ObjectId.get().toHexString(),
 	val userId: String,
-	val requestStatus: RequestStatus = RequestStatus.PROCESSING,
+	val requestStatus: RequestStatus = RequestStatus.WAITING,
 	val processType: ImageProcessType,
 	val photoList: List<String>,
 	val createYmdt: LocalDateTime = LocalDateTime.now(),
-	val updateYmdt: LocalDateTime = LocalDateTime.now()
+	val updateYmdt: LocalDateTime = LocalDateTime.now(),
 )

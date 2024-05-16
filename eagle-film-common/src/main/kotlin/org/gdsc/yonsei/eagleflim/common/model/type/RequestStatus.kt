@@ -1,5 +1,5 @@
 package org.gdsc.yonsei.eagleflim.common.model.type
 
 enum class RequestStatus {
-	NOT_REQUESTED, PROCESSING, ERROR, COMPLETED
+	NOT_REQUESTED, WAITING, PROCESSING, ERROR, COMPLETED
 }
