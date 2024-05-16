@@ -29,7 +29,7 @@ class PhotoRequestService(
 		val photoRequest = PhotoRequest(userId = userInfo.userId, processType = imageProcessType, photoList = imageList)
 		photoRequestRepository.create(photoRequest)
 		photoRequestRepository.submitRequest(photoRequest.requestId)
-		userRepository.updateRequestStatus(userInfo.userId, RequestStatus.PROCESSING)
+		userRepository.updateRequestStatus(userInfo.userId, RequestStatus.WAITING)
 	}
 
 	// TODO: 사용자가 요청하는 것은 불가능함 - 서버 요청에 의해서만 접근할 수 있도록 해야 함
@@ -42,14 +42,19 @@ class PhotoRequestService(
 			if (requestId != null) photoRequestRepository.findOneByUserIdAndRequestId(userInfo.userId, requestId)
 			else photoRequestRepository.findRecentByUserId(userInfo.userId)
 
-		return request?.let {
-			PhotoRequestInfoFactory.ofEntry(it)
-		} ?: throw ErrorCd.NOT_EXIST_REQUEST.serviceException("not exist request")
+		return request?.let(this::createPhotoRequestInfo) ?: throw ErrorCd.NOT_EXIST_REQUEST.serviceException("not exist request")
 	}
 
 	fun getRequestList(userInfo: UserInfo, size: Int, pageToken: String?): List<PhotoRequestInfo> {
 		return photoRequestRepository.findByUserIdWithSize(userInfo.userId, size, pageToken)
-			.map { PhotoRequestInfoFactory.ofEntry(it) }
+			.map(this::createPhotoRequestInfo)
+	}
+
+	private fun createPhotoRequestInfo(photoRequest: PhotoRequest): PhotoRequestInfo {
+		val userId = photoRequest.userId
+		val originalImageList = photoRepository.findByPhotoIdList(userId, photoRequest.photoList)
+		val resultImage = photoRequest.resultPhoto?.let { photoRepository.getPhoto(userId, it) }
+		return PhotoRequestInfoFactory.ofEntry(photoRequest, originalImageList, resultImage)
 	}
 
 	private fun validateRequest(userId: String) {

@@ -8,5 +8,7 @@ data class PhotoRequestInfo(
 	val userId: String,
 	val requestStatus: RequestStatus,
 	val createYmdt: LocalDateTime,
-	val updateYmdt: LocalDateTime
+	val updateYmdt: LocalDateTime,
+	val originalImages: List<PhotoInfo>,
+	val resultImage: PhotoInfo?
 )

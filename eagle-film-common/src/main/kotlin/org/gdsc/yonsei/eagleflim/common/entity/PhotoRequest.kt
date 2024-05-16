@@ -14,6 +14,7 @@ data class PhotoRequest(
 	val requestStatus: RequestStatus = RequestStatus.WAITING,
 	val processType: ImageProcessType,
 	val photoList: List<String>,
+	val resultPhoto: String? = null,
 	val createYmdt: LocalDateTime = LocalDateTime.now(),
 	val updateYmdt: LocalDateTime = LocalDateTime.now(),
 )
