@@ -1,3 +1,10 @@
+server:
+    port: 8080
+    ssl:
+        key-store: ${EAGLE_FILM_SSL_KEY_STORE}
+        key-store-type: ${EAGLE_FILM_SSL_KEY_STORE_TYPE}
+        key-store-password: ${EAGLE_FILM_SSL_KEY_STORE_PASSWORD}
+
 spring:
     rabbitmq:
         host: dev.eagle-film.vsfe.me
