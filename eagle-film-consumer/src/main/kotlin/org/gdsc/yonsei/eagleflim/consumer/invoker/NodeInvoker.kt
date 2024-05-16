@@ -7,6 +7,8 @@ import org.gdsc.yonsei.eagleflim.consumer.invoker.discord.DiscordInvoker
 import org.gdsc.yonsei.eagleflim.consumer.invoker.discord.DiscordMessageUtil
 import org.gdsc.yonsei.eagleflim.consumer.model.GenerationResult
 import org.gdsc.yonsei.eagleflim.consumer.model.NodeIdleInfo
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
@@ -19,11 +21,13 @@ import org.springframework.retry.policy.SimpleRetryPolicy
 import org.springframework.retry.support.RetryTemplate
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import java.io.BufferedReader
 import java.io.IOException
+import java.io.InputStream
 
 @Component
 class NodeInvoker(
-	private val discordInvoker: DiscordInvoker
+	private val discordInvoker: DiscordInvoker,
 ) {
 	fun checkIdle(nodeUrl: String): Boolean {
 		return invoke(nodeUrl, NodeCommand.CHECK_IDLE, null, object : ParameterizedTypeReference<NodeIdleInfo>() {})?.idle ?: false
@@ -44,22 +48,32 @@ class NodeInvoker(
 
 	private fun <T> invoke(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
 		var requestSpec = nodeRestClient.method(nodeCommand.httpMethod)
-			.uri(baseUrl + nodeCommand.location)
+			.uri("http://" + baseUrl + nodeCommand.location)
 			.contentType(MediaType.APPLICATION_JSON)
 
 		param?.let {
 			requestSpec = requestSpec.body(it)
 		}
 
-		return requestSpec
+		val result = requestSpec
 			.retrieve()
 			.onStatus(HttpStatusCode::is4xxClientError) {
 				_, response -> throw HttpInvokerException(response.statusCode, nodeCommand.location, param)
 			}
 			.onStatus(HttpStatusCode::is5xxServerError) {
-				_, _ -> discordInvoker.sendMessage(DiscordMessageUtil.createNodeInternalServerMessage(baseUrl))
+				_, response -> run {
+					logger.error("[NodeInvoker] API Call Failed. statusCode: {}, body: {}", response.statusCode, readBody(response.body))
+					discordInvoker.sendMessage(DiscordMessageUtil.createNodeInternalServerMessage(baseUrl))
+				}
 			}
 			.body(type)
+
+		logger.debug("[NodeInvoker] API Call - baseUrl: {}, nodeCommand: {}, result: {}", baseUrl, nodeCommand, result)
+		return result
+	}
+
+	private fun readBody(body: InputStream): String {
+		return body.bufferedReader().use(BufferedReader::readText)
 	}
 
 	companion object {
@@ -78,5 +92,7 @@ class NodeInvoker(
 				}
 			}
 		}
+
+		val logger: Logger = LoggerFactory.getLogger(NodeInvoker::class.java)
 	}
 }
