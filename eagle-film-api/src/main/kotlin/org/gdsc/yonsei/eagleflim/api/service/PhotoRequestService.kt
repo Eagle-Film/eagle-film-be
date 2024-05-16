@@ -3,6 +3,7 @@ package org.gdsc.yonsei.eagleflim.api.service
 import org.gdsc.yonsei.eagleflim.api.exception.ErrorCd
 import org.gdsc.yonsei.eagleflim.api.repository.PhotoRepository
 import org.gdsc.yonsei.eagleflim.api.repository.PhotoRequestRepository
+import org.gdsc.yonsei.eagleflim.api.repository.UserRepository
 import org.gdsc.yonsei.eagleflim.common.entity.PhotoRequest
 import org.gdsc.yonsei.eagleflim.common.model.PhotoRequestInfo
 import org.gdsc.yonsei.eagleflim.common.model.UserInfo
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Service
 @Service
 class PhotoRequestService(
 	private val photoRequestRepository: PhotoRequestRepository,
-	private val photoRepository: PhotoRepository
+	private val photoRepository: PhotoRepository,
+	private val userRepository: UserRepository
 ) {
 	/**
 	 * 이미지 처리 요청을 생성한다.
@@ -27,6 +29,7 @@ class PhotoRequestService(
 		val photoRequest = PhotoRequest(userId = userInfo.userId, processType = imageProcessType, photoList = imageList)
 		photoRequestRepository.create(photoRequest)
 		photoRequestRepository.submitRequest(photoRequest.requestId)
+		userRepository.updateRequestStatus(userInfo.userId, RequestStatus.PROCESSING)
 	}
 
 	// TODO: 사용자가 요청하는 것은 불가능함 - 서버 요청에 의해서만 접근할 수 있도록 해야 함

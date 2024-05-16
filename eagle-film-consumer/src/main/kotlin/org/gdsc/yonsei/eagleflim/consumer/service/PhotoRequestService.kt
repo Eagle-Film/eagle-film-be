@@ -9,6 +9,7 @@ import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.gdsc.yonsei.eagleflim.consumer.repository.NodeRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.PhotoRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
+import org.gdsc.yonsei.eagleflim.consumer.repository.UserRepository
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,6 +17,7 @@ class PhotoRequestService(
 	private val photoRepository: PhotoRepository,
 	private val requestRepository: RequestRepository,
 	private val nodeRepository: NodeRepository,
+	private val userRepository: UserRepository,
 	private val nodeInvoker: NodeInvoker,
 	private val bucketFileHelper: BucketFileHelper
 ) {
@@ -29,6 +31,7 @@ class PhotoRequestService(
 		nodeInvoker.requestInference(nodeUrl, imageList, request.processType)
 		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = false, assignedRequest = requestId))
 		requestRepository.updateStatus(requestId, RequestStatus.PROCESSING)
+		userRepository.updateRequestStatus(request.userId, RequestStatus.PROCESSING)
 	}
 
 	fun completeRequest(nodeUrl: String, requestId: String, resultImage: String) {
@@ -40,6 +43,7 @@ class PhotoRequestService(
 
 		photoRepository.insertPhoto(processedPhoto)
 		requestRepository.updateStatus(requestId, RequestStatus.COMPLETED)
+		userRepository.updateRequestStatus(request.userId, RequestStatus.WAITING)
 		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = true, assignedRequest = null))
 
 		// TODO: Web Push Noti

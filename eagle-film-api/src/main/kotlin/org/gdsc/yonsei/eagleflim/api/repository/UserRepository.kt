@@ -2,9 +2,11 @@ package org.gdsc.yonsei.eagleflim.api.repository
 
 import org.gdsc.yonsei.eagleflim.common.entity.User
 import org.gdsc.yonsei.eagleflim.common.model.type.OAuthProvider
+import org.gdsc.yonsei.eagleflim.common.model.type.RequestStatus
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
 
 @Service
@@ -25,5 +27,11 @@ class UserRepository(
 	fun getUser(id: String): User? {
 		val criteria = Criteria.where("_id").`is`(id)
 		return mongoTemplate.findOne(Query.query(criteria), User::class.java)
+	}
+
+	fun updateRequestStatus(id: String, requestStatus: RequestStatus) {
+		val criteria = Criteria.where("_id").`is`(id)
+		val update = Update.update("requestStatus", requestStatus)
+		mongoTemplate.findAndModify(Query.query(criteria), update, User::class.java)
 	}
 }
