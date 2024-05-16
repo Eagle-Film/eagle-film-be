@@ -1,23 +1,17 @@
+server:
+    port: 8888
+
 spring:
-    rabbitmq:
-        host: dev.eagle-film.vsfe.me
-        port: 5672
-    servlet:
-        multipart:
-            max-file-size: 30MB
-            max-request-size: 100MB
     data:
         redis:
             host: ${EAGLE_FILM_REDIS_HOST}
             port: ${EAGLE_FILM_REDIS_PORT}
 
+discord:
+    url: ${EAGLE_FILM_DISCORD_WEBHOOK}
+
 mongodb:
     connectionString: ${EAGLE_FILM_MONGODB_CONNECTION_STRING}
-
-oauth:
-    kakao:
-        clientCode: e60282fe069d1c422ec1078ee4a29929
-        redirectUri: https://yonsei-eagle-studio.vercel.app/kakao-token
 
 cloud:
     aws:
@@ -32,9 +26,6 @@ cloud:
             auto: false
         stack:
             auto: false
-
-file:
-    dir: /
 
 logging:
     level:
