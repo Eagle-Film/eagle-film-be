@@ -37,6 +37,15 @@ class RequestRepository(
 		mongoTemplate.findAndModify(Query.query(criteria), update, PhotoRequest::class.java)
 	}
 
+	fun updateStatusWithImage(requestId: String, status: RequestStatus, photoId: String) {
+		val criteria = Criteria.where("_id").`is`(requestId)
+		val update = Update.update("requestStatus", status)
+			.set("updateYmdt", LocalDateTime.now())
+			.set("resultImage", photoId)
+
+		mongoTemplate.findAndModify(Query.query(criteria), update, PhotoRequest::class.java)
+	}
+
 	companion object {
 		const val REDIS_LABEL_REQUEST: String = "request"
 	}

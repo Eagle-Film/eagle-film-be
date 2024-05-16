@@ -43,7 +43,7 @@ class PhotoRequestService(
 		val processedPhoto = photo.copy(imageUrl = uploadedUrl)
 
 		photoRepository.insertPhoto(processedPhoto)
-		requestRepository.updateStatus(requestId, RequestStatus.COMPLETED)
+		requestRepository.updateStatusWithImage(requestId, RequestStatus.COMPLETED, processedPhoto.photoId)
 		userRepository.updateRequestStatus(request.userId, RequestStatus.COMPLETED)
 		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = true, assignedRequest = null))
 
