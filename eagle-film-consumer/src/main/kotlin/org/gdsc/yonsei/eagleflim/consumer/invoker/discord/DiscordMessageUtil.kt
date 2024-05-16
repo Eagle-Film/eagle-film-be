@@ -35,4 +35,12 @@ object DiscordMessageUtil {
 			errorMessage: $errorMessage
 		""".trimIndent()
 	}
+
+	fun warnDanglingRequestMessage(requestId: String): String {
+		return """
+			**WARNING: Dangling Request Exist. Please retry asap.**
+			---
+			requestId: $requestId
+		""".trimIndent()
+	}
 }
