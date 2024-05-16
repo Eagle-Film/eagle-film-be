@@ -1,12 +1,12 @@
 package org.gdsc.yonsei.eagleflim.consumer.core
 
+import org.gdsc.yonsei.eagleflim.common.model.type.RequestStatus
 import org.gdsc.yonsei.eagleflim.consumer.invoker.NodeInvoker
 import org.gdsc.yonsei.eagleflim.consumer.invoker.discord.DiscordInvoker
 import org.gdsc.yonsei.eagleflim.consumer.invoker.discord.DiscordMessageUtil
 import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.gdsc.yonsei.eagleflim.consumer.repository.NodeRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
-import org.gdsc.yonsei.eagleflim.consumer.service.NodeService
 import org.gdsc.yonsei.eagleflim.consumer.service.PhotoRequestService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -18,8 +18,6 @@ class NodeSchedulingJob(
 	private var nodeInvoker: NodeInvoker,
 	private val discordInvoker: DiscordInvoker,
 	private val requestRepository: RequestRepository,
-	private val requestService: PhotoRequestService,
-	private val nodeService: NodeService,
 	private val photoRequestService: PhotoRequestService
 ) {
 	@Scheduled(fixedDelay = 10000)
@@ -79,12 +77,29 @@ class NodeSchedulingJob(
 		}.filter {
 			it.second.status
 		}.forEach {
-			photoRequestService.completeRequest(it.first.assignedRequest!!, it.second.resultImage!!)
+			photoRequestService.completeRequest(it.first.address, it.first.assignedRequest!!, it.second.resultImage!!)
 		}
 	}
 
+	/**
+	 * 정합성에 어긋난 노드를 제거하기 전, 할당된 요청이 있는지 확인한다.
+	 */
+	private fun invalidNodePostProcess(nodeUrl: String): String? {
+		val nodeInfo = nodeRepository.getNodeInfo(nodeUrl)
+		if (nodeInfo != null && !nodeInfo.waiting) {
+			val assignedRequest = nodeInfo.assignedRequest
+			requestRepository.updateStatus(assignedRequest!!, RequestStatus.ERROR)
+
+			return assignedRequest
+		}
+
+		return null
+	}
+
 	private fun processInconsistentNode(nodeUrl: String, errorMessage: String = "Unknown Error") {
+		val containPreprocessedRequest = invalidNodePostProcess(nodeUrl)
 		discordInvoker.sendMessage(DiscordMessageUtil.nodeValidateFailedMessage(nodeUrl, errorMessage))
+		containPreprocessedRequest?.let { discordInvoker.sendMessage(DiscordMessageUtil.warnDanglingRequestMessage(it)) }
 		nodeRepository.removeNode(nodeUrl)
 	}
 }

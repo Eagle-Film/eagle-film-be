@@ -1,25 +1,47 @@
 package org.gdsc.yonsei.eagleflim.consumer.service
 
+import org.gdsc.yonsei.eagleflim.common.entity.Photo
+import org.gdsc.yonsei.eagleflim.common.model.type.ImageStatus
+import org.gdsc.yonsei.eagleflim.common.model.type.RequestStatus
+import org.gdsc.yonsei.eagleflim.consumer.infra.BucketFileHelper
+import org.gdsc.yonsei.eagleflim.consumer.invoker.NodeInvoker
+import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.gdsc.yonsei.eagleflim.consumer.repository.NodeRepository
+import org.gdsc.yonsei.eagleflim.consumer.repository.PhotoRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
 import org.springframework.stereotype.Service
 
 @Service
 class PhotoRequestService(
+	private val photoRepository: PhotoRepository,
 	private val requestRepository: RequestRepository,
-	private val nodeRepository: NodeRepository
+	private val nodeRepository: NodeRepository,
+	private val nodeInvoker: NodeInvoker,
+	private val bucketFileHelper: BucketFileHelper
 ) {
 	fun assignRequest(requestId: String, nodeUrl: String) {
-		// 데이터 존재여부 확인
-		// 이미지 서버에서 전부 다운로드
-		// base64로 변환
-		// node에 요청
+		val request = requestRepository.selectOneRequest(requestId) ?: error("Request with requestId $requestId not found")
+		// TODO: 데이터 정합성 체크 - DB 조회 + 본인이 만든 이미지인지 체크할 필요가 있음
+		val imageList = request.photoList.map {
+			bucketFileHelper.downloadFile(it)
+		}
+
+		nodeInvoker.requestInference(nodeUrl, imageList, request.processType)
+		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = false, assignedRequest = requestId))
+		requestRepository.updateStatus(requestId, RequestStatus.PROCESSING)
 	}
 
-	fun completeRequest(requestId: String, resultImage: String) {
-		// 이미지 변환
-		// 서버에 저장
-		// db에 데이터 갱신 작업 진행
-		// redis 상태 갱신
+	fun completeRequest(nodeUrl: String, requestId: String, resultImage: String) {
+		val request = requestRepository.selectOneRequest(requestId) ?: error("Request with requestId $requestId not found")
+		val photo = Photo(userId = request.userId, imageStatus = ImageStatus.PROCESSED)
+
+		val uploadedUrl = bucketFileHelper.uploadFile(photo.photoId, bucketFileHelper.convertToFile(resultImage))
+		val processedPhoto = photo.copy(imageUrl = uploadedUrl)
+
+		photoRepository.insertPhoto(processedPhoto)
+		requestRepository.updateStatus(requestId, RequestStatus.COMPLETED)
+		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = true, assignedRequest = null))
+
+		// TODO: Web Push Noti
 	}
 }
