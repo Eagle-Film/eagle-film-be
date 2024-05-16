@@ -3,20 +3,21 @@ package org.gdsc.yonsei.eagleflim.consumer.repository
 import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrDefault
 
 @Component
 class NodeRepository(
 	private val stringRedisTemplate: RedisTemplate<String, String>,
-	private val nodeInfoRedisTemplate: RedisTemplate<String, NodeInfo>
+	private val nodeInfoRedisRepository: NodeInfoRedisRepository
 ) {
 	fun insertNode(address: String) {
 		stringRedisTemplate.opsForSet().add(REDIS_LABEL_NODE_ADDRESS, address)
-		nodeInfoRedisTemplate.opsForValue().set(REDIS_LABLE_NODE_INFO_FORMAT.format(address), NodeInfo(address))
+		nodeInfoRedisRepository.save(NodeInfo(address))
 	}
 
 	fun removeNode(address: String) {
 		stringRedisTemplate.opsForSet().remove(REDIS_LABEL_NODE_ADDRESS, address)
-		nodeInfoRedisTemplate.opsForValue().getAndDelete(REDIS_LABLE_NODE_INFO_FORMAT.format(address))
+		nodeInfoRedisRepository.deleteById(address)
 	}
 
 	fun selectAllNodes(): Set<String> {
@@ -28,11 +29,14 @@ class NodeRepository(
 	}
 
 	fun getNodeInfo(address: String): NodeInfo? {
-		return nodeInfoRedisTemplate.opsForValue().get(REDIS_LABLE_NODE_INFO_FORMAT.format(address))
+		return nodeInfoRedisRepository.findById(address).getOrDefault(null)
+	}
+
+	fun updateNodeInfo(nodeInfo: NodeInfo) {
+		nodeInfoRedisRepository.save(nodeInfo)
 	}
 
 	companion object {
-		const val REDIS_LABEL_NODE_ADDRESS: String = "Node_Address" // 전체 노드
-		const val REDIS_LABLE_NODE_INFO_FORMAT: String = "Node_Info_%s" // Request 할당 된 Node 및 Pair 된 Request 정보
+		const val REDIS_LABEL_NODE_ADDRESS: String = "nodeAddress" // 전체 노드
 	}
 }
