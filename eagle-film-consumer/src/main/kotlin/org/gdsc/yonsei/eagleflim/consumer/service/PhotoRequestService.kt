@@ -43,7 +43,7 @@ class PhotoRequestService(
 
 		photoRepository.insertPhoto(processedPhoto)
 		requestRepository.updateStatus(requestId, RequestStatus.COMPLETED)
-		userRepository.updateRequestStatus(request.userId, RequestStatus.WAITING)
+		userRepository.updateRequestStatus(request.userId, RequestStatus.COMPLETED)
 		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = true, assignedRequest = null))
 
 		// TODO: Web Push Noti
