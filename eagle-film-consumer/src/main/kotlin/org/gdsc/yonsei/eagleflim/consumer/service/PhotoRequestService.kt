@@ -31,6 +31,7 @@ class PhotoRequestService(
 		nodeInvoker.requestInference(nodeUrl, imageList, request.processType)
 		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = false, assignedRequest = requestId))
 		requestRepository.updateStatus(requestId, RequestStatus.PROCESSING)
+		requestRepository.deleteRequest(requestId)
 		userRepository.updateRequestStatus(request.userId, RequestStatus.PROCESSING)
 	}
 

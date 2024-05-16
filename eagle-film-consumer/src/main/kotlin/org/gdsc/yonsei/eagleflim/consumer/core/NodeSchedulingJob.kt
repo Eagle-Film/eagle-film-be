@@ -51,9 +51,17 @@ class NodeSchedulingJob(
 				val nodeStatusFromServer = nodeInvoker.checkIdle(nodeAddress)
 				val nodeStatusFromRedis = it.second
 
-				if (nodeStatusFromRedis == null || nodeStatusFromRedis.waiting != nodeStatusFromServer) {
+				if (nodeStatusFromRedis == null) {
 					processInconsistentNode(nodeAddress, "Node idle status not matched")
 					return@filter false
+				}
+
+				if (nodeStatusFromRedis.waiting != nodeStatusFromServer) {
+					val response = nodeInvoker.checkFinished(nodeAddress)
+					if (!response.finish) {
+						processInconsistentNode(nodeAddress, "Node idle status not matched")
+						return@filter false
+					}
 				}
 
 				return@filter true
@@ -75,9 +83,10 @@ class NodeSchedulingJob(
 		nodeInfoList.map {
 			it to nodeInvoker.checkFinished(it.address)
 		}.filter {
-			it.second.status
+			it.second.finish
 		}.forEach {
-			photoRequestService.completeRequest(it.first.address, it.first.assignedRequest!!, it.second.resultImage!!)
+			photoRequestService.completeRequest(it.first.address, it.first.assignedRequest!!, it.second.image!!)
+			discordInvoker.sendMessage(DiscordMessageUtil.jobFinished(it.first.assignedRequest!!))
 		}
 	}
 

@@ -18,6 +18,7 @@ class BucketFileHelper(
 	fun uploadFile(fileName: String, byteArray: ByteArray): String {
 		val objectMetadata = ObjectMetadata()
 
+		objectMetadata.contentType = "image/png"
 		objectMetadata.contentLength = byteArray.size.toLong()
 
 		val objectRequest = PutObjectRequest(bucket, fileName, byteArray.inputStream(), objectMetadata)

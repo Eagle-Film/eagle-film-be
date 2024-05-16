@@ -43,4 +43,12 @@ object DiscordMessageUtil {
 			requestId: $requestId
 		""".trimIndent()
 	}
+
+	fun jobFinished(requestId: String): String {
+		return """
+			**Request Finished!!**
+			---
+			requestId: $requestId
+		""".trimIndent()
+	}
 }

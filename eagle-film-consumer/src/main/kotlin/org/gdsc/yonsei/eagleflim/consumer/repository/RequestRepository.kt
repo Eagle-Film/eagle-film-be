@@ -25,15 +25,19 @@ class RequestRepository(
 		return mongoTemplate.findOne(Query.query(Criteria.where("_id").`is`(requestId)), PhotoRequest::class.java)
 	}
 
+	fun deleteRequest(requestId: String) {
+		stringRedisTemplate.opsForSet().remove(REDIS_LABEL_REQUEST, requestId)
+	}
+
 	fun updateStatus(requestId: String, status: RequestStatus) {
 		val criteria = Criteria.where("_id").`is`(requestId)
-		val update = Update.update("status", status)
+		val update = Update.update("requestStatus", status)
 			.set("updateYmdt", LocalDateTime.now())
 
 		mongoTemplate.findAndModify(Query.query(criteria), update, PhotoRequest::class.java)
 	}
 
 	companion object {
-		const val REDIS_LABEL_REQUEST: String = "Request"
+		const val REDIS_LABEL_REQUEST: String = "request"
 	}
 }
