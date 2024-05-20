@@ -1,6 +1,7 @@
 package org.gdsc.yonsei.eagleflim.consumer.controller
 
 import org.gdsc.yonsei.eagleflim.consumer.controller.model.NodeInput
+import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.gdsc.yonsei.eagleflim.consumer.service.NodeService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -25,7 +26,7 @@ class ManageController(
 	}
 
 	@GetMapping("/status")
-	fun scan() {
-
+	fun scan(): List<NodeInfo> {
+		return nodeService.getAllNodeStatus()
 	}
 }
