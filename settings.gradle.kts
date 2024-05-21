@@ -5,3 +5,4 @@ rootProject.name = "eaglefilm"
 include("eagle-film-api")
 include("eagle-film-consumer")
 include("eagle-film-common")
+include("eagle-film-manage")

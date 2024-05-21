@@ -1,0 +1,6 @@
+server:
+    port: 9999
+discord:
+    token: ${EAGLE_FILM_DISCORD_TOKEN}
+consumer:
+    address: ${EAGLE_FILM_CONSUMER_ADDRESS}
