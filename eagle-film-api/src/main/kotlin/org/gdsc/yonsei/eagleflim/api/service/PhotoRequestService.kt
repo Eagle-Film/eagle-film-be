@@ -53,7 +53,7 @@ class PhotoRequestService(
 	private fun createPhotoRequestInfo(photoRequest: PhotoRequest): PhotoRequestInfo {
 		val userId = photoRequest.userId
 		val originalImageList = photoRepository.findByPhotoIdList(userId, photoRequest.photoList)
-		val resultImage = photoRequest.resultPhoto?.let { photoRepository.getPhoto(userId, it) }
+		val resultImage = photoRequest.resultImage?.let { photoRepository.getPhoto(userId, it) }
 		return PhotoRequestInfoFactory.ofEntry(photoRequest, originalImageList, resultImage)
 	}
 

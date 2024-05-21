@@ -48,3 +48,6 @@ logging:
         root: debug
         com:
             mongodb: info
+
+noti:
+    url: ${EAGLE_FILM_NOTI_URL}

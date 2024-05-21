@@ -19,6 +19,7 @@ class PhotoRequestService(
 	private val nodeRepository: NodeRepository,
 	private val userRepository: UserRepository,
 	private val nodeInvoker: NodeInvoker,
+	private val notiService: NotiService,
 	private val bucketFileHelper: BucketFileHelper
 ) {
 	fun assignRequest(requestId: String, nodeUrl: String) {
@@ -48,5 +49,6 @@ class PhotoRequestService(
 		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = true, assignedRequest = null))
 
 		// TODO: Web Push Noti
+		notiService.sendNoti(request.userId)
 	}
 }

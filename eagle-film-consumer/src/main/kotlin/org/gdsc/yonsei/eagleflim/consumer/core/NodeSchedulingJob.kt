@@ -7,6 +7,7 @@ import org.gdsc.yonsei.eagleflim.consumer.invoker.discord.DiscordMessageUtil
 import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.gdsc.yonsei.eagleflim.consumer.repository.NodeRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
+import org.gdsc.yonsei.eagleflim.consumer.service.NotiService
 import org.gdsc.yonsei.eagleflim.consumer.service.PhotoRequestService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component

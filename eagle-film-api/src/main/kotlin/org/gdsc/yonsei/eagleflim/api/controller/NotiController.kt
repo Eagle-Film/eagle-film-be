@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RestController
 class NotiController(val notiService: NotiService) {
 	@PostMapping
 	fun createNoti(@EagleUser userInfo: UserInfo, @RequestBody notiRequestInput: NotiRequestInput) {
-		notiService.createNoti(userInfo, notiRequestInput.requestId, notiRequestInput.tokenId)
+		notiService.createNoti(userInfo, notiRequestInput.tokenId)
 	}
 }

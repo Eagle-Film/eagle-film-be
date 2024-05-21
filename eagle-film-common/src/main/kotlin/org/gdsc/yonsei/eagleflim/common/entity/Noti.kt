@@ -8,6 +8,5 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Noti(
 	@Id val notiId: String = ObjectId.get().toHexString(),
 	val userId: String,
-	val requestId: String,
 	val notiToken: String
 )
