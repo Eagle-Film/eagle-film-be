@@ -18,12 +18,12 @@ class ManageRepository(
 	private val mongoTemplate: MongoTemplate
 ) {
 	fun withdraw(userId: String) {
-		val criteria = Criteria.where("id").`is`(userId)
+		val criteria = Criteria.where("_id").`is`(userId)
 		mongoTemplate.remove(Query.query(criteria), User::class.java)
 	}
 
 	fun setRequestStatus(requestId: String, requestStatus: RequestStatus) {
-		val criteria = Criteria.where("id").`is`(requestId)
+		val criteria = Criteria.where("_id").`is`(requestId)
 		val update = Update.update("requestStatus", requestStatus)
 
 		mongoTemplate.findAndModify(Query.query(criteria), update, PhotoRequest::class.java)
