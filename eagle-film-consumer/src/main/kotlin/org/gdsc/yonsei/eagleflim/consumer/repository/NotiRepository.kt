@@ -4,9 +4,9 @@ import org.gdsc.yonsei.eagleflim.common.entity.Noti
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 
-@Repository
+@Component
 class NotiRepository(
 	val mongoTemplate: MongoTemplate
 ) {
