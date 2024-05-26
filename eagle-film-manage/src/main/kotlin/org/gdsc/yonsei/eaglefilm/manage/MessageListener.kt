@@ -15,47 +15,82 @@ class MessageListener(
 
 		val message = event.message
 		val content = message.contentRaw
+		val channel = event.channel
 
+		when {
+			content == "!help" -> channel.sendMessage("""
+				!정기웅: 정기웅
+				!ping: pong
+				!nodeStatus: 노드의 상태를 출력합니다.
+				!registerNode (node address): 노드를 추가합니다.
+				!deleteNode (node address): 노드를 제거합니다.
+				!waitingRequests : 처리되지 않고 대기중인 요청의 목록을 가져옵니다.
+				!searchUser (user name): 유저 정보를 검색합니다. (이름이 겹치는 사용자가 있을 경우, 모두 출력)
+				!deleteUser (userId): 해당 유저를 제거합니다.
+			""".trimIndent()).queue()
 
-		if (content == "!ping") {
-			val channel = event.channel
-			channel.sendMessage("뽕~").queue()
-		}
+			content == "!ping" -> channel.sendMessage("뽕~").queue()
 
-		if (content == "!정기웅") {
-			val channel = event.channel
-			channel.sendMessage("""
+			content == "!정기웅" -> {
+				channel.sendMessage(
+					"""
 				우정 이행시
 				우: 우~
 				정: 정기웅
-			""".trimIndent()).queue()
-		}
-
-		if (content.startsWith("!registerNode")) {
-			val channel = event.channel
-			if (content.split(" ").size != 2) {
-				channel.sendMessage("invalid request - usage: \"!registerNode {address}\"").queue()
-				return
+			""".trimIndent()
+				).queue()
 			}
-			val address = content.split(" ")[1]
-			consumerInvoker.registerNode(address)
-		}
 
-		if (content == "!nodeStatus") {
-			val channel = event.channel
-			val result = consumerInvoker.getNodeList()
-			val message = result?.toString() ?: "ERROR"
-			channel.sendMessage(message).queue()
-		}
-
-		if (content.startsWith("!deleteNode")) {
-			val channel = event.channel
-			if (content.split(" ").size != 2) {
-				channel.sendMessage("invalid request - usage: \"!deleteNode {address}\"").queue()
-				return
+			content == "!nodeStatus" -> {
+				val result = consumerInvoker.getNodeList()
+				val message = result?.toString() ?: "ERROR"
+				channel.sendMessage(message).queue()
 			}
-			val address = content.split(" ")[1]
-			consumerInvoker.deleteNode(address)
+
+			content == "!waitingRequests" -> {
+				val requests = consumerInvoker.getWaitingList()
+				channel.sendMessage(requests.toString()).queue()
+			}
+
+			content.startsWith("!registerNode") -> {
+				if (content.split(" ").size != 2) {
+					channel.sendMessage("invalid request - usage: \"!registerNode {address}\"").queue()
+					return
+				}
+				val address = content.split(" ")[1]
+				consumerInvoker.registerNode(address)
+			}
+
+			content.startsWith("!deleteNode") -> {
+				if (content.split(" ").size != 2) {
+					channel.sendMessage("invalid request - usage: \"!deleteNode {address}\"").queue()
+					return
+				}
+				val address = content.split(" ")[1]
+				consumerInvoker.deleteNode(address)
+			}
+
+			content.startsWith("!searchUser") -> {
+				if (content.split(" ").size != 2) {
+					channel.sendMessage("invalid request - usage: \"!searchUser {userName}\"").queue()
+					return
+				}
+				val userName = content.split(" ")[1]
+				val result = consumerInvoker.findUserByName(userName)
+
+				channel.sendMessage(result.toString()).queue()
+			}
+
+			content.startsWith("!deleteUser") -> {
+				if (content.split(" ").size != 2) {
+					channel.sendMessage("invalid request - usage: \"!deleteUser {userId}\"").queue()
+					return
+				}
+				val userId = content.split(" ")[1]
+				val count = consumerInvoker.deleteUser(userId)
+				val content = if (count == 0) "user not exist" else "user delete complete."
+				channel.sendMessage(content).queue()
+			}
 		}
 	}
 }

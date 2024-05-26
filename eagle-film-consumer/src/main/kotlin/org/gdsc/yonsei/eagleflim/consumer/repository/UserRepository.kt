@@ -17,4 +17,14 @@ class UserRepository(
 		val update = Update.update("requestStatus", requestStatus)
 		mongoTemplate.findAndModify(Query.query(criteria), update, User::class.java)
 	}
+
+	fun removeUser(id: String): Long {
+		val criteria = Criteria.where("_id").`is`(id)
+		return mongoTemplate.remove(Query.query(criteria), User::class.java).deletedCount
+	}
+
+	fun findByUserName(userName: String): List<User> {
+		val criteria = Criteria.where("userName").`is`(userName)
+		return mongoTemplate.find(Query.query(criteria), User::class.java) ?: listOf()
+	}
 }
