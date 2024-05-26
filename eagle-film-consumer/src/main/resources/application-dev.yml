@@ -35,3 +35,6 @@ logging:
 
 noti:
     url: ${EAGLE_FILM_NOTI_URL}
+
+cors:
+    allowed: *

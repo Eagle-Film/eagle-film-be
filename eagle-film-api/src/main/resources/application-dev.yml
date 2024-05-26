@@ -24,7 +24,7 @@ mongodb:
 oauth:
     kakao:
         clientCode: e60282fe069d1c422ec1078ee4a29929
-        redirectUri: https://yonsei-eagle-studio.vercel.app/kakao-token
+        redirectUri: https://beta.eaglefilm.photo/kakao-token
 
 cloud:
     aws:
@@ -51,3 +51,6 @@ logging:
 
 noti:
     url: ${EAGLE_FILM_NOTI_URL}
+
+cors:
+    allowed: ${EAGLE_FILM_CORS_ALLOW}
