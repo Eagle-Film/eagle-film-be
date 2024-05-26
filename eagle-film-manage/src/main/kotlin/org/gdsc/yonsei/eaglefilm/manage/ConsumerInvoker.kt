@@ -15,12 +15,12 @@ class ConsumerInvoker(
 ) {
 	fun registerNode(url: String) {
 		val param = mapOf("address" to url)
-		invoke(ConsumerCommand.REGISTER_NODE, param, object : ParameterizedTypeReference<Unit>() { })
+		invoke(ConsumerCommand.REGISTER_NODE, param, object : ParameterizedTypeReference<Unit>() {})
 	}
 
 	fun deleteNode(url: String) {
 		val param = mapOf("address" to url)
-		invoke(ConsumerCommand.DELETE_NODE, param, object : ParameterizedTypeReference<Unit>() { })
+		invoke(ConsumerCommand.DELETE_NODE, param, object : ParameterizedTypeReference<Unit>() {})
 	}
 
 	fun getNodeList(): List<Map<String, String>>? {
@@ -38,8 +38,8 @@ class ConsumerInvoker(
 
 		return requestSpec
 			.retrieve()
-			.onStatus(HttpStatusCode::is4xxClientError) {
-					_, response -> logger.warn("invoke failed - statusCode: {}", response.statusCode)
+			.onStatus(HttpStatusCode::is4xxClientError) { _, response ->
+				logger.warn("invoke failed - statusCode: {}", response.statusCode)
 			}
 			.body(type)
 	}
@@ -56,7 +56,7 @@ enum class ConsumerCommand(
 	val location: String,
 	val httpMethod: HttpMethod
 ) {
-	REGISTER_NODE("/consumer/v1/manage/node", HttpMethod.POST),
-	DELETE_NODE("/consumer/v1/manage/node", HttpMethod.DELETE),
-	SCAN_NODE("/consumer/v1/manage/status", HttpMethod.GET),
+	REGISTER_NODE("consumer/v1/manage/node", HttpMethod.POST),
+	DELETE_NODE("consumer/v1/manage/node", HttpMethod.DELETE),
+	SCAN_NODE("consumer/v1/manage/status", HttpMethod.GET),
 }
