@@ -68,7 +68,7 @@ class NodeInvoker(
 			}
 			.body(type)
 
-		logger.debug("[NodeInvoker] API Call - baseUrl: {}, nodeCommand: {}, result: {}", baseUrl, nodeCommand, result)
+		logger.debug("[NodeInvoker] API Call - baseUrl: {}, param: {}, nodeCommand: {}, result: {}", baseUrl, param, nodeCommand, result)
 		return result
 	}
 
