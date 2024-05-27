@@ -27,6 +27,7 @@ class MessageListener(
 				!waitingRequests : 처리되지 않고 대기중인 요청의 목록을 가져옵니다.
 				!searchUser (user name): 유저 정보를 검색합니다. (이름이 겹치는 사용자가 있을 경우, 모두 출력)
 				!deleteUser (userId): 해당 유저를 제거합니다.
+				!reassignJob (requestId): 실패한 요청을 다시 재시작 합니다. (Queue에 재 할당, 우선순위는 미뤄짐)
 			""".trimIndent()).queue()
 
 			content == "!ping" -> channel.sendMessage("뽕~").queue()
@@ -90,6 +91,16 @@ class MessageListener(
 				val count = consumerInvoker.deleteUser(userId)
 				val content = if (count == 0) "user not exist" else "user delete complete."
 				channel.sendMessage(content).queue()
+			}
+
+			content.startsWith("!reassignJob") -> {
+				if (content.split(" ").size != 2) {
+					channel.sendMessage("invalid request - usage: \"!reassignJob {userId}\"").queue()
+					return
+				}
+				val reassignJob = content.split(" ")[1]
+				consumerInvoker.registerNode(reassignJob)
+				channel.sendMessage("OK").queue()
 			}
 		}
 	}

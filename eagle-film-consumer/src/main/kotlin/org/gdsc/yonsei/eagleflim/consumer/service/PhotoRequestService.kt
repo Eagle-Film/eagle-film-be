@@ -51,4 +51,14 @@ class PhotoRequestService(
 		// TODO: Web Push Noti
 		notiService.sendNoti(request.userId)
 	}
+
+	fun retryRequest(requestId: String) {
+		val request = requestRepository.selectOneRequest(requestId) ?: error("Request not exist")
+		if (request.requestStatus == RequestStatus.WAITING || request.requestStatus == RequestStatus.PROCESSING) {
+			error("awaiting requests can not retry.")
+		}
+
+		requestRepository.updateStatus(requestId, RequestStatus.WAITING)
+		requestRepository.createRequest(requestId)
+	}
 }

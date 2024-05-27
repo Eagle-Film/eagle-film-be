@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import java.lang.reflect.Parameter
 
 @Component
 class ConsumerInvoker(
@@ -43,6 +42,11 @@ class ConsumerInvoker(
 	fun deleteUser(userId: String): Int {
 		val param = mapOf("userId" to userId)
 		return invoke(ConsumerCommand.DELETE_USER, param, object : ParameterizedTypeReference<Int>() {}) ?: 0
+	}
+
+	fun reassignJob(requestId: String) {
+		val param = mapOf("requestId" to requestId)
+		invoke(ConsumerCommand.REASSIGN_JOB, param, object : ParameterizedTypeReference<Unit>() {})
 	}
 
 	fun <T> invoke(consumerCommand: ConsumerCommand, param: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
@@ -79,5 +83,6 @@ enum class ConsumerCommand(
 	SCAN_NODE("consumer/v1/manage/status", HttpMethod.GET),
 	DELETE_USER("consumer/v1/manage/deleteUser", HttpMethod.POST),
 	WAITING_LIST("consumer/v1/manage/waiting", HttpMethod.GET),
-	SEARCH_USER("consumer/v1/manage/search", HttpMethod.POST)
+	SEARCH_USER("consumer/v1/manage/search", HttpMethod.POST),
+	REASSIGN_JOB("consumer/v1/manage/reassignJob", HttpMethod.POST)
 }

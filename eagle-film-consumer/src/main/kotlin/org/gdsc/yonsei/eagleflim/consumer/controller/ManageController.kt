@@ -3,17 +3,18 @@ package org.gdsc.yonsei.eagleflim.consumer.controller
 import org.gdsc.yonsei.eagleflim.common.entity.User
 import org.gdsc.yonsei.eagleflim.consumer.controller.model.DeleteUserInput
 import org.gdsc.yonsei.eagleflim.consumer.controller.model.NodeInput
+import org.gdsc.yonsei.eagleflim.consumer.controller.model.ReassignJobInput
 import org.gdsc.yonsei.eagleflim.consumer.controller.model.SearchInput
 import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
 import org.gdsc.yonsei.eagleflim.consumer.service.NodeService
+import org.gdsc.yonsei.eagleflim.consumer.service.PhotoRequestService
 import org.gdsc.yonsei.eagleflim.consumer.service.UserService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 class ManageController(
 	private val nodeService: NodeService,
 	private val userService: UserService,
+	private val requestService: PhotoRequestService,
 	private val requestRepository: RequestRepository
 ) {
 	@PostMapping("/node")
@@ -51,5 +53,10 @@ class ManageController(
 	@PostMapping("/search")
 	fun searchUser(@RequestBody searchInput: SearchInput): List<User> {
 		return userService.searchUser(searchInput.userName)
+	}
+
+	@PostMapping("/reassignJob")
+	fun reassignJob(@RequestBody jobInput: ReassignJobInput) {
+		requestService.retryRequest(jobInput.requestId)
 	}
 }

@@ -29,6 +29,10 @@ class RequestRepository(
 		stringRedisTemplate.opsForSet().remove(REDIS_LABEL_REQUEST, requestId)
 	}
 
+	fun createRequest(requestId: String) {
+		stringRedisTemplate.opsForSet().add(REDIS_LABEL_REQUEST, requestId)
+	}
+
 	fun updateStatus(requestId: String, status: RequestStatus) {
 		val criteria = Criteria.where("_id").`is`(requestId)
 		val update = Update.update("requestStatus", status)
