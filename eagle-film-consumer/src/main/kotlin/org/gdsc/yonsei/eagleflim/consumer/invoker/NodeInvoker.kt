@@ -1,6 +1,5 @@
 package org.gdsc.yonsei.eagleflim.consumer.invoker
 
-import org.gdsc.yonsei.eagleflim.common.entity.PhotoRequest
 import org.gdsc.yonsei.eagleflim.common.model.type.ImageProcessType
 import org.gdsc.yonsei.eagleflim.consumer.exception.HttpInvokerException
 import org.gdsc.yonsei.eagleflim.consumer.invoker.discord.DiscordInvoker
@@ -68,7 +67,7 @@ class NodeInvoker(
 			}
 			.body(type)
 
-		logger.debug("[NodeInvoker] API Call - baseUrl: {}, param: {}, nodeCommand: {}, result: {}", baseUrl, param, nodeCommand, result)
+		logger.debug("[NodeInvoker] API Call - baseUrl: {}, param: {}, nodeCommand: {}, result: {}", baseUrl, param, nodeCommand, if (nodeCommand == NodeCommand.INFER_REQUEST) "SKIP" else result)
 		return result
 	}
 
@@ -86,7 +85,7 @@ class NodeInvoker(
 				val retryTemplate = RetryTemplate()
 				retryTemplate.setRetryPolicy(SimpleRetryPolicy(3))
 				try {
-					return@ClientHttpRequestInterceptor retryTemplate.execute<ClientHttpResponse, IOException> { context: RetryContext? -> execution.execute(request, body) }
+					return@ClientHttpRequestInterceptor retryTemplate.execute<ClientHttpResponse, IOException> { _ : RetryContext? -> execution.execute(request, body) }
 				} catch (throwable: Throwable) {
 					throw RuntimeException(throwable)
 				}
