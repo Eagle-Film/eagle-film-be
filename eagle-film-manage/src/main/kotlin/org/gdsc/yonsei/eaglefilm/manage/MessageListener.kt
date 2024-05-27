@@ -20,6 +20,7 @@ class MessageListener(
 		when {
 			content == "!help" -> channel.sendMessage("""
 				!정기웅: 정기웅
+				!정퀸웅: 정퀸웅
 				!ping: pong
 				!nodeStatus: 노드의 상태를 출력합니다.
 				!registerNode (node address): 노드를 추가합니다.
@@ -42,18 +43,20 @@ class MessageListener(
 				).queue()
 			}
 
-			content == "!nodeStatus" -> {
+			content == "!정퀸웅" -> channel.sendMessage("https://kr.object.ncloudstorage.com/eagle-film-dev/66538d5b72e347617530a8f6").queue()
+
+			content == "!nodeStatus" || content == "!ns" -> {
 				val result = consumerInvoker.getNodeList()
 				val message = result?.toString() ?: "ERROR"
 				channel.sendMessage(message).queue()
 			}
 
-			content == "!waitingRequests" -> {
+			content == "!waitingRequests" || content == "!ws" -> {
 				val requests = consumerInvoker.getWaitingList()
 				channel.sendMessage(requests.toString()).queue()
 			}
 
-			content.startsWith("!registerNode") -> {
+			content.startsWith("!registerNode") || content.startsWith("!rn") -> {
 				if (content.split(" ").size != 2) {
 					channel.sendMessage("invalid request - usage: \"!registerNode {address}\"").queue()
 					return
@@ -62,7 +65,7 @@ class MessageListener(
 				consumerInvoker.registerNode(address)
 			}
 
-			content.startsWith("!deleteNode") -> {
+			content.startsWith("!deleteNode") || content.startsWith("!dn") -> {
 				if (content.split(" ").size != 2) {
 					channel.sendMessage("invalid request - usage: \"!deleteNode {address}\"").queue()
 					return
@@ -71,7 +74,7 @@ class MessageListener(
 				consumerInvoker.deleteNode(address)
 			}
 
-			content.startsWith("!searchUser") -> {
+			content.startsWith("!searchUser") || content.startsWith("!su") -> {
 				if (content.split(" ").size != 2) {
 					channel.sendMessage("invalid request - usage: \"!searchUser {userName}\"").queue()
 					return
@@ -82,7 +85,7 @@ class MessageListener(
 				channel.sendMessage(result.toString()).queue()
 			}
 
-			content.startsWith("!deleteUser") -> {
+			content.startsWith("!deleteUser") || content.startsWith("!du") -> {
 				if (content.split(" ").size != 2) {
 					channel.sendMessage("invalid request - usage: \"!deleteUser {userId}\"").queue()
 					return
@@ -93,7 +96,7 @@ class MessageListener(
 				channel.sendMessage(content).queue()
 			}
 
-			content.startsWith("!reassignJob") -> {
+			content.startsWith("!reassignJob") || content.startsWith("!rj") -> {
 				if (content.split(" ").size != 2) {
 					channel.sendMessage("invalid request - usage: \"!reassignJob {userId}\"").queue()
 					return
