@@ -75,11 +75,11 @@ class MessageListener(
 			}
 
 			content.startsWith("!searchUser") || content.startsWith("!su") -> {
-				if (content.split(" ").size != 2) {
+				if (content.split(" ").size == 1) {
 					channel.sendMessage("invalid request - usage: \"!searchUser {userName}\"").queue()
 					return
 				}
-				val userName = content.split(" ")[1]
+				val userName = content.substring(content.indexOf(" ") + 1)
 				val result = consumerInvoker.findUserByName(userName)
 
 				channel.sendMessage(result.toString()).queue()
@@ -102,7 +102,7 @@ class MessageListener(
 					return
 				}
 				val reassignJob = content.split(" ")[1]
-				consumerInvoker.registerNode(reassignJob)
+				consumerInvoker.reassignJob(reassignJob)
 				channel.sendMessage("OK").queue()
 			}
 		}
