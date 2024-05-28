@@ -29,6 +29,7 @@ class MessageListener(
 				!searchUser (user name): 유저 정보를 검색합니다. (이름이 겹치는 사용자가 있을 경우, 모두 출력)
 				!deleteUser (userId): 해당 유저를 제거합니다.
 				!reassignJob (requestId): 실패한 요청을 다시 재시작 합니다. (Queue에 재 할당, 우선순위는 미뤄짐)
+				!searchRequest (requestId): 요청 정보를 가져옵니다.
 			""".trimIndent()).queue()
 
 			content == "!ping" -> channel.sendMessage("뽕~").queue()
@@ -106,7 +107,7 @@ class MessageListener(
 				channel.sendMessage("OK").queue()
 			}
 
-			content.startsWith("!searchRequest") || content.startsWith("sr") -> {
+			content.startsWith("!searchRequest") || content.startsWith("!sr") -> {
 				if (content.split(" ").size != 2) {
 					channel.sendMessage("invalid request - usage: \"!searchRequest {requestId}\"").queue()
 					return

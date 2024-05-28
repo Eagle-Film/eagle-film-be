@@ -20,6 +20,7 @@ import org.springframework.retry.policy.SimpleRetryPolicy
 import org.springframework.retry.support.RetryTemplate
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.util.UriComponentsBuilder
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -29,11 +30,14 @@ class NodeInvoker(
 	private val discordInvoker: DiscordInvoker,
 ) {
 	fun checkIdle(nodeUrl: String): Boolean {
-		return invoke(nodeUrl, NodeCommand.CHECK_IDLE, null, object : ParameterizedTypeReference<NodeIdleInfo>() {})?.idle ?: false
+		return invoke(nodeUrl, NodeCommand.CHECK_IDLE, null, null, object : ParameterizedTypeReference<NodeIdleInfo>() {})?.idle ?: false
 	}
 
-	fun checkFinished(nodeUrl: String): GenerationResult {
-		return invoke(nodeUrl, NodeCommand.CHECK_FINISH, null, object : ParameterizedTypeReference<GenerationResult>() {}) ?: error("body is null")
+	fun checkFinished(nodeUrl: String, requestId: String): GenerationResult {
+		val urlParam = mapOf(
+			"reqId" to requestId
+		)
+		return invoke(nodeUrl, NodeCommand.CHECK_FINISH, null, urlParam, object : ParameterizedTypeReference<GenerationResult>() {}) ?: error("body is null")
 	}
 
 	fun requestInference(nodeUrl: String, requestId: String, photoList: List<String>, imageProcessType: ImageProcessType) {
@@ -43,12 +47,14 @@ class NodeInvoker(
 			"gender" to imageProcessType.code
 		)
 
-		invoke(nodeUrl, NodeCommand.INFER_REQUEST, param, object : ParameterizedTypeReference<Unit>() { })
+		invoke(nodeUrl, NodeCommand.INFER_REQUEST, param, null, object : ParameterizedTypeReference<Unit>() { })
 	}
 
-	private fun <T> invoke(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
+	private fun <T> invoke(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, urlParam: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
+		val uri = urlParam?.let { UriComponentsBuilder.fromUriString(nodeCommand.location).buildAndExpand(it).toUriString() } ?: ("$baseUrl/${nodeCommand.location}")
+
 		var requestSpec = nodeRestClient.method(nodeCommand.httpMethod)
-			.uri("http://" + baseUrl + nodeCommand.location)
+			.uri(uri)
 			.contentType(MediaType.APPLICATION_JSON)
 
 		param?.let {

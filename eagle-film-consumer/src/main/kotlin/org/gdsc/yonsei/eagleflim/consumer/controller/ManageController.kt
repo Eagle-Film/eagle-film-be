@@ -1,5 +1,6 @@
 package org.gdsc.yonsei.eagleflim.consumer.controller
 
+import org.gdsc.yonsei.eagleflim.common.entity.PhotoRequest
 import org.gdsc.yonsei.eagleflim.common.entity.User
 import org.gdsc.yonsei.eagleflim.consumer.controller.model.*
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
@@ -63,8 +64,10 @@ class ManageController(
 	}
 
 	@GetMapping("/waiting")
-	fun waitingStatus(): List<String> {
-		return requestRepository.selectAllWaitingRequests().toList()
+	fun waitingStatus(): List<PhotoRequest> {
+		return requestRepository.selectAllWaitingRequests().mapNotNull {
+			requestRepository.selectOneRequest(it)
+		}
 	}
 
 	@PostMapping("/search")

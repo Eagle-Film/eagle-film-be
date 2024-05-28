@@ -7,7 +7,6 @@ import org.gdsc.yonsei.eagleflim.consumer.invoker.discord.DiscordMessageUtil
 import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.gdsc.yonsei.eagleflim.consumer.repository.NodeRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
-import org.gdsc.yonsei.eagleflim.consumer.service.NotiService
 import org.gdsc.yonsei.eagleflim.consumer.service.PhotoRequestService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -58,7 +57,7 @@ class NodeSchedulingJob(
 				}
 
 				if (nodeStatusFromRedis.waiting != nodeStatusFromServer) {
-					val response = nodeInvoker.checkFinished(nodeAddress)
+					val response = nodeInvoker.checkFinished(nodeAddress, nodeStatusFromRedis.assignedRequest!!)
 					if (!response.finish) {
 						processInconsistentNode(nodeAddress, "Node idle status not matched")
 						return@filter false
@@ -82,7 +81,7 @@ class NodeSchedulingJob(
 
 	private fun checkResult(nodeInfoList: List<NodeInfo>) {
 		nodeInfoList.map {
-			it to nodeInvoker.checkFinished(it.address)
+			it to nodeInvoker.checkFinished(it.address, it.assignedRequest!!)
 		}.filter {
 			it.second.finish
 		}.forEach {
