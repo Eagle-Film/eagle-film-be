@@ -29,7 +29,7 @@ class PhotoRequestService(
 			bucketFileHelper.downloadFile(it)
 		}
 
-		nodeInvoker.requestInference(nodeUrl, imageList, request.processType)
+		nodeInvoker.requestInference(nodeUrl, requestId, imageList, request.processType)
 		nodeRepository.updateNodeInfo(NodeInfo(nodeUrl, waiting = false, assignedRequest = requestId))
 		requestRepository.updateStatus(requestId, RequestStatus.PROCESSING)
 		requestRepository.deleteRequest(requestId)

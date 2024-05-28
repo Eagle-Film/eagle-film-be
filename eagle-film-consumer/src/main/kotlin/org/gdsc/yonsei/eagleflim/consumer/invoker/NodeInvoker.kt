@@ -36,8 +36,9 @@ class NodeInvoker(
 		return invoke(nodeUrl, NodeCommand.CHECK_FINISH, null, object : ParameterizedTypeReference<GenerationResult>() {}) ?: error("body is null")
 	}
 
-	fun requestInference(nodeUrl: String, photoList: List<String>, imageProcessType: ImageProcessType) {
+	fun requestInference(nodeUrl: String, requestId: String, photoList: List<String>, imageProcessType: ImageProcessType) {
 		val param = mapOf(
+			"reqId" to requestId,
 			"images" to photoList,
 			"gender" to imageProcessType.code
 		)
