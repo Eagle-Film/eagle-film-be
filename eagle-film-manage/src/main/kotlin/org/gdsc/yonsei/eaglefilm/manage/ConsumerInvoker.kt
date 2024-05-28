@@ -30,8 +30,8 @@ class ConsumerInvoker(
 		invoke(ConsumerCommand.DELETE_NODE, param, null, object : ParameterizedTypeReference<Unit>() {})
 	}
 
-	fun getNodeList(): List<Map<String, String>>? {
-		return invoke(ConsumerCommand.SCAN_NODE, null, null, object : ParameterizedTypeReference<List<Map<String, String>>>() {})
+	fun getNodeList(): List<NodeStatusOutput>? {
+		return invoke(ConsumerCommand.SCAN_NODE, null, null, object : ParameterizedTypeReference<List<NodeStatusOutput>>() {})
 	}
 
 	fun getWaitingList(): List<String> {
