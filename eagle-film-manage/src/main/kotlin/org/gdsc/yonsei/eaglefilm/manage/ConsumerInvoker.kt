@@ -9,6 +9,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestClient
 import org.springframework.web.util.UriComponentsBuilder
 
@@ -51,13 +53,14 @@ class ConsumerInvoker(
 		invoke(ConsumerCommand.REASSIGN_JOB, param, null, object : ParameterizedTypeReference<Unit>() {})
 	}
 
-	fun searchRequest(requestId: String): Map<String, String> {
-		val requestParam = mapOf("requestId" to requestId)
-		return invoke(ConsumerCommand.SEARCH_REQUEST, null, requestParam, object : ParameterizedTypeReference<Map<String, String>>() {}) ?: mapOf()
+	fun searchRequest(requestId: String): Map<String, Any> {
+		val requestParam = LinkedMultiValueMap<String, String>()
+		requestParam.add("requestId", requestId)
+		return invoke(ConsumerCommand.SEARCH_REQUEST, null, requestParam, object : ParameterizedTypeReference<Map<String, Any>>() {}) ?: mapOf()
 	}
 
-	fun <T> invoke(consumerCommand: ConsumerCommand, bodyParam: Map<String, Any>?, requestParam: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
-		val uri = requestParam?.let { UriComponentsBuilder.fromUriString(consumerCommand.location).buildAndExpand(it).toUriString() } ?: ("$baseUrl/${consumerCommand.location}")
+	fun <T> invoke(consumerCommand: ConsumerCommand, bodyParam: Map<String, Any>?, requestParam: MultiValueMap<String, String>?, type: ParameterizedTypeReference<T>): T? {
+		val uri = requestParam?.let { baseUrl + "/" + UriComponentsBuilder.fromUriString(consumerCommand.location).queryParams(it).toUriString() } ?: ("$baseUrl/${consumerCommand.location}")
 
 		var requestSpec = consumerRestClient.method(consumerCommand.httpMethod)
 			.uri(uri)

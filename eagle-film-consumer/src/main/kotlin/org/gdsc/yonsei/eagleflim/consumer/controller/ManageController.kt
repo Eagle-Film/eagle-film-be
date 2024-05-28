@@ -54,7 +54,7 @@ class ManageController(
 	@GetMapping("/searchRequest")
 	fun searchRequest(@RequestParam requestId: String = ""): RequestUserInfoOutput {
 		val request = requestRepository.selectOneRequest(requestId) ?: return RequestUserInfoOutput(null, null)
-		val user = userService.getUser(request.userId) ?: return RequestUserInfoOutput(null, null)
+		val user = userService.getUser(request.userId) ?: return RequestUserInfoOutput(request, null)
 		return RequestUserInfoOutput(request, user)
 	}
 

@@ -9,20 +9,14 @@ import org.gdsc.yonsei.eagleflim.consumer.model.NodeIdleInfo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
-import org.springframework.http.client.ClientHttpRequestExecution
-import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.http.client.ClientHttpResponse
-import org.springframework.retry.RetryContext
-import org.springframework.retry.policy.SimpleRetryPolicy
-import org.springframework.retry.support.RetryTemplate
 import org.springframework.stereotype.Component
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestClient
 import org.springframework.web.util.UriComponentsBuilder
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStream
 
 @Component
@@ -34,9 +28,8 @@ class NodeInvoker(
 	}
 
 	fun checkFinished(nodeUrl: String, requestId: String): GenerationResult {
-		val urlParam = mapOf(
-			"reqId" to requestId
-		)
+		val urlParam = LinkedMultiValueMap<String, String>()
+		urlParam.add("reqId", requestId)
 		return invoke(nodeUrl, NodeCommand.CHECK_FINISH, null, urlParam, object : ParameterizedTypeReference<GenerationResult>() {}) ?: error("body is null")
 	}
 
@@ -50,8 +43,8 @@ class NodeInvoker(
 		invoke(nodeUrl, NodeCommand.INFER_REQUEST, param, null, object : ParameterizedTypeReference<Unit>() { })
 	}
 
-	private fun <T> invoke(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, urlParam: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
-		val uri = urlParam?.let { UriComponentsBuilder.fromUriString(nodeCommand.location).buildAndExpand(it).toUriString() } ?: ("$baseUrl/${nodeCommand.location}")
+	private fun <T> invoke(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, urlParam: MultiValueMap<String, String>?, type: ParameterizedTypeReference<T>): T? {
+		val uri = urlParam?.let { baseUrl + "/" + UriComponentsBuilder.fromUriString(nodeCommand.location).queryParams(it).toUriString() } ?: ("$baseUrl/${nodeCommand.location}")
 
 		var requestSpec = nodeRestClient.method(nodeCommand.httpMethod)
 			.uri("http://" + uri)
@@ -84,20 +77,20 @@ class NodeInvoker(
 
 	companion object {
 		val nodeRestClient: RestClient = RestClient.builder()
-			.requestInterceptor(clientHttpRequestInterceptor())
+//			.requestInterceptor(clientHttpRequestInterceptor())
 			.build()
 
-		private fun clientHttpRequestInterceptor(): ClientHttpRequestInterceptor {
-			return ClientHttpRequestInterceptor { request: HttpRequest?, body: ByteArray?, execution: ClientHttpRequestExecution ->
-				val retryTemplate = RetryTemplate()
-				retryTemplate.setRetryPolicy(SimpleRetryPolicy(3))
-				try {
-					return@ClientHttpRequestInterceptor retryTemplate.execute<ClientHttpResponse, IOException> { _ : RetryContext? -> execution.execute(request, body) }
-				} catch (throwable: Throwable) {
-					throw RuntimeException(throwable)
-				}
-			}
-		}
+//		private fun clientHttpRequestInterceptor(): ClientHttpRequestInterceptor {
+//			return ClientHttpRequestInterceptor { request: HttpRequest?, body: ByteArray?, execution: ClientHttpRequestExecution ->
+//				val retryTemplate = RetryTemplate()
+//				retryTemplate.setRetryPolicy(SimpleRetryPolicy(3))
+//				try {
+//					return@ClientHttpRequestInterceptor retryTemplate.execute<ClientHttpResponse, IOException> { _ : RetryContext? -> execution.execute(request, body) }
+//				} catch (throwable: Throwable) {
+//					throw RuntimeException(throwable)
+//				}
+//			}
+//		}
 
 		val logger: Logger = LoggerFactory.getLogger(NodeInvoker::class.java)
 	}
