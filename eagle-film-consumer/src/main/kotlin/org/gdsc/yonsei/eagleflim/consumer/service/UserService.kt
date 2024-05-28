@@ -15,4 +15,8 @@ class UserService(
     fun searchUser(userName: String): List<User> {
         return userRepository.findByUserName(userName)
     }
+
+    fun getUser(userId: String): User? {
+        return userRepository.findById(userId)
+    }
 }

@@ -27,4 +27,9 @@ class UserRepository(
 		val criteria = Criteria.where("userName").`is`(userName)
 		return mongoTemplate.find(Query.query(criteria), User::class.java) ?: listOf()
 	}
+
+	fun findById(userId: String): User? {
+		val criteria = Criteria.where("userId").`is`(userId)
+		return mongoTemplate.findOne(Query.query(criteria), User::class.java)
+	}
 }

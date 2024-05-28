@@ -98,12 +98,22 @@ class MessageListener(
 
 			content.startsWith("!reassignJob") || content.startsWith("!rj") -> {
 				if (content.split(" ").size != 2) {
-					channel.sendMessage("invalid request - usage: \"!reassignJob {userId}\"").queue()
+					channel.sendMessage("invalid request - usage: \"!reassignJob {requestId}\"").queue()
 					return
 				}
 				val reassignJob = content.split(" ")[1]
 				consumerInvoker.reassignJob(reassignJob)
 				channel.sendMessage("OK").queue()
+			}
+
+			content.startsWith("!searchRequest") || content.startsWith("sr") -> {
+				if (content.split(" ").size != 2) {
+					channel.sendMessage("invalid request - usage: \"!searchRequest {requestId}\"").queue()
+					return
+				}
+				val requestId = content.split(" ")[1]
+				val result = consumerInvoker.searchRequest(requestId)
+				channel.sendMessage(result.toString()).queue()
 			}
 		}
 	}

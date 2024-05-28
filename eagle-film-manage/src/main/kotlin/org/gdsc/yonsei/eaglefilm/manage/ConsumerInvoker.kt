@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class ConsumerInvoker(
@@ -16,45 +17,52 @@ class ConsumerInvoker(
 ) {
 	fun registerNode(url: String) {
 		val param = mapOf("address" to url)
-		invoke(ConsumerCommand.REGISTER_NODE, param, object : ParameterizedTypeReference<Unit>() {})
+		invoke(ConsumerCommand.REGISTER_NODE, param, null, object : ParameterizedTypeReference<Unit>() {})
 	}
 
 	fun findUserByName(userName: String): List<User> {
 		val param = mapOf("userName" to userName)
-		return invoke(ConsumerCommand.SEARCH_USER, param, object : ParameterizedTypeReference<List<User>>() {}) ?: listOf()
+		return invoke(ConsumerCommand.SEARCH_USER, param, null, object : ParameterizedTypeReference<List<User>>() {}) ?: listOf()
 	}
 
 	fun deleteNode(url: String) {
 		val param = mapOf("address" to url)
-		invoke(ConsumerCommand.DELETE_NODE, param, object : ParameterizedTypeReference<Unit>() {})
+		invoke(ConsumerCommand.DELETE_NODE, param, null, object : ParameterizedTypeReference<Unit>() {})
 	}
 
 	fun getNodeList(): List<Map<String, String>>? {
-		return invoke(ConsumerCommand.SCAN_NODE, null, object : ParameterizedTypeReference<List<Map<String, String>>>() {})
+		return invoke(ConsumerCommand.SCAN_NODE, null, null, object : ParameterizedTypeReference<List<Map<String, String>>>() {})
 	}
 
 	fun getWaitingList(): List<String> {
-		return invoke(ConsumerCommand.WAITING_LIST, null,
+		return invoke(ConsumerCommand.WAITING_LIST, null, null,
 			object : ParameterizedTypeReference<List<String>>() {
 			} ) ?: listOf()
 	}
 
 	fun deleteUser(userId: String): Int {
 		val param = mapOf("userId" to userId)
-		return invoke(ConsumerCommand.DELETE_USER, param, object : ParameterizedTypeReference<Int>() {}) ?: 0
+		return invoke(ConsumerCommand.DELETE_USER, param, null, object : ParameterizedTypeReference<Int>() {}) ?: 0
 	}
 
 	fun reassignJob(requestId: String) {
 		val param = mapOf("requestId" to requestId)
-		invoke(ConsumerCommand.REASSIGN_JOB, param, object : ParameterizedTypeReference<Unit>() {})
+		invoke(ConsumerCommand.REASSIGN_JOB, param, null, object : ParameterizedTypeReference<Unit>() {})
 	}
 
-	fun <T> invoke(consumerCommand: ConsumerCommand, param: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
+	fun searchRequest(requestId: String): Map<String, String> {
+		val requestParam = mapOf("requestId" to requestId)
+		return invoke(ConsumerCommand.SEARCH_REQUEST, null, requestParam, object : ParameterizedTypeReference<Map<String, String>>() {}) ?: mapOf()
+	}
+
+	fun <T> invoke(consumerCommand: ConsumerCommand, bodyParam: Map<String, Any>?, requestParam: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
+		val uri = requestParam?.let { UriComponentsBuilder.fromUriString(consumerCommand.location).buildAndExpand(it).toUriString() } ?: ("$baseUrl/$consumerCommand")
+
 		var requestSpec = consumerRestClient.method(consumerCommand.httpMethod)
-			.uri(baseUrl + "/" + consumerCommand.location)
+			.uri(uri)
 			.contentType(MediaType.APPLICATION_JSON)
 
-		param?.let {
+		bodyParam?.let {
 			requestSpec = requestSpec.body(it)
 		}
 
@@ -83,6 +91,7 @@ enum class ConsumerCommand(
 	SCAN_NODE("consumer/v1/manage/status", HttpMethod.GET),
 	DELETE_USER("consumer/v1/manage/deleteUser", HttpMethod.POST),
 	WAITING_LIST("consumer/v1/manage/waiting", HttpMethod.GET),
+	SEARCH_REQUEST("consumer/v1/manage/searchRequest", HttpMethod.GET),
 	SEARCH_USER("consumer/v1/manage/search", HttpMethod.POST),
-	REASSIGN_JOB("consumer/v1/manage/reassignJob", HttpMethod.POST)
+	REASSIGN_JOB("consumer/v1/manage/reassignJob", HttpMethod.POST),
 }

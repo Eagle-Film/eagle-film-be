@@ -67,7 +67,7 @@ class NodeInvoker(
 			}
 			.body(type)
 
-		logger.debug("[NodeInvoker] API Call - baseUrl: {}, param: {}, nodeCommand: {}, result: {}", baseUrl, param, nodeCommand, if (nodeCommand == NodeCommand.INFER_REQUEST) "SKIP" else result)
+		logger.debug("[NodeInvoker] API Call - baseUrl: {}, param: {}, nodeCommand: {}, result: {}", baseUrl, param, nodeCommand, if (nodeCommand == NodeCommand.CHECK_FINISH) "SKIP" else result)
 		return result
 	}
 

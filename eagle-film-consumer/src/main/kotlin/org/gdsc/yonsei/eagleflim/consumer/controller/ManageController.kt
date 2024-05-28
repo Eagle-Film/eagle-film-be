@@ -1,12 +1,9 @@
 package org.gdsc.yonsei.eagleflim.consumer.controller
 
 import org.gdsc.yonsei.eagleflim.common.entity.User
-import org.gdsc.yonsei.eagleflim.consumer.controller.model.DeleteUserInput
-import org.gdsc.yonsei.eagleflim.consumer.controller.model.NodeInput
-import org.gdsc.yonsei.eagleflim.consumer.controller.model.ReassignJobInput
-import org.gdsc.yonsei.eagleflim.consumer.controller.model.SearchInput
-import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
+import org.gdsc.yonsei.eagleflim.consumer.controller.model.*
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
+import org.gdsc.yonsei.eagleflim.consumer.repository.UserRepository
 import org.gdsc.yonsei.eagleflim.consumer.service.NodeService
 import org.gdsc.yonsei.eagleflim.consumer.service.PhotoRequestService
 import org.gdsc.yonsei.eagleflim.consumer.service.UserService
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -23,7 +21,8 @@ class ManageController(
 	private val nodeService: NodeService,
 	private val userService: UserService,
 	private val requestService: PhotoRequestService,
-	private val requestRepository: RequestRepository
+	private val requestRepository: RequestRepository,
+	private val userRepository: UserRepository
 ) {
 	@PostMapping("/node")
 	fun registerNode(@RequestBody nodeInput: NodeInput) {
@@ -36,8 +35,26 @@ class ManageController(
 	}
 
 	@GetMapping("/status")
-	fun scan(): List<NodeInfo> {
-		return nodeService.getAllNodeStatus()
+	fun scan(): List<NodeStatusOutput> {
+		val nodeStatusList = nodeService.getAllNodeStatus()
+		return nodeStatusList.map {
+			val requestInfo = it.assignedRequest?.let {
+				request -> return@let requestRepository.selectOneRequest(request)
+			}
+			val userId = requestInfo?.userId
+			val userInfo = userId?.let {
+				user -> return@let userService.getUser(user)
+			}
+
+			return@map NodeStatusOutput(it, requestInfo, userInfo)
+		}
+	}
+
+	@GetMapping("/searchRequest")
+	fun searchRequest(@RequestParam requestId: String = ""): RequestUserInfoOutput {
+		val request = requestRepository.selectOneRequest(requestId) ?: return RequestUserInfoOutput(null, null)
+		val user = userService.getUser(request.userId) ?: return RequestUserInfoOutput(null, null)
+		return RequestUserInfoOutput(request, user)
 	}
 
 	@PostMapping("/deleteUser")
