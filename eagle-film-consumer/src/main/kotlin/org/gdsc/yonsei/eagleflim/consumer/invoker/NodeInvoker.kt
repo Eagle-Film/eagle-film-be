@@ -54,7 +54,7 @@ class NodeInvoker(
 		val uri = urlParam?.let { UriComponentsBuilder.fromUriString(nodeCommand.location).buildAndExpand(it).toUriString() } ?: ("$baseUrl/${nodeCommand.location}")
 
 		var requestSpec = nodeRestClient.method(nodeCommand.httpMethod)
-			.uri(uri)
+			.uri("http://" + uri)
 			.contentType(MediaType.APPLICATION_JSON)
 
 		param?.let {
