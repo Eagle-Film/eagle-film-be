@@ -56,7 +56,7 @@ class ConsumerInvoker(
 	}
 
 	fun <T> invoke(consumerCommand: ConsumerCommand, bodyParam: Map<String, Any>?, requestParam: Map<String, Any>?, type: ParameterizedTypeReference<T>): T? {
-		val uri = requestParam?.let { UriComponentsBuilder.fromUriString(consumerCommand.location).buildAndExpand(it).toUriString() } ?: ("$baseUrl/$consumerCommand")
+		val uri = requestParam?.let { UriComponentsBuilder.fromUriString(consumerCommand.location).buildAndExpand(it).toUriString() } ?: ("$baseUrl/${consumerCommand.location}")
 
 		var requestSpec = consumerRestClient.method(consumerCommand.httpMethod)
 			.uri(uri)
