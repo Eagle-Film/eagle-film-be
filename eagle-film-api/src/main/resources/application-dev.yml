@@ -4,6 +4,11 @@ server:
         key-store: ${EAGLE_FILM_SSL_KEY_STORE}
         key-store-type: ${EAGLE_FILM_SSL_KEY_STORE_TYPE}
         key-store-password: ${EAGLE_FILM_SSL_KEY_STORE_PASSWORD}
+    tomcat:
+        basedir: .
+        accesslog:
+            enabled: true
+            pattern: %{yyyy-MM-dd HH:mm:ss}t\\t%s\\t%r\\t%{User-Agent}i\\t%{Referer}i\\t%a\\t%b
 
 spring:
     rabbitmq:
