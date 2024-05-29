@@ -1,6 +1,5 @@
 package org.gdsc.yonsei.eaglefilm.manage
 
-import org.gdsc.yonsei.eagleflim.common.entity.PhotoRequest
 import org.gdsc.yonsei.eagleflim.common.entity.User
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -37,9 +36,9 @@ class ConsumerInvoker(
 		return invoke(ConsumerCommand.SCAN_NODE, null, null, object : ParameterizedTypeReference<List<Map<String, Any>>>() {})
 	}
 
-	fun getWaitingList(): List<PhotoRequest> {
+	fun getWaitingList(): List<Map<String, Any>> {
 		return invoke(ConsumerCommand.WAITING_LIST, null, null,
-			object : ParameterizedTypeReference<List<PhotoRequest>>() {
+			object : ParameterizedTypeReference<List<Map<String, Any>>>() {
 			} ) ?: listOf()
 	}
 
