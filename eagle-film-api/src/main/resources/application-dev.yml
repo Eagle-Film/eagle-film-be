@@ -30,6 +30,7 @@ cloud:
     aws:
         s3:
             endpoint: https://kr.object.ncloudstorage.com
+            rl: ${EAGLE_FILM_S3_RESOURCE_LOCATION}
         credentials:
             access-key: ${EAGLE_FILM_S3_ACCESS_KEY}
             secret-key: ${EAGLE_FILM_S3_SECRET_KEY}

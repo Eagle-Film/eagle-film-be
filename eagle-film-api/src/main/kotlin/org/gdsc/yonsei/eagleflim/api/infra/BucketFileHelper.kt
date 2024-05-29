@@ -14,6 +14,7 @@ class BucketFileHelper(
 	private val amazonS3: AmazonS3,
 	@Value("\${cloud.aws.credentials.bucket}") val bucket: String,
 	@Value("\${cloud.aws.s3.endpoint}") val baseUrl: String,
+	@Value("\${cloud.aws.s3.rl}") val resourceLocation: String
 ) : AbstractFileHelper {
 	override fun uploadFile(fileName: String, multipartFile: MultipartFile): String {
 		val objectMetadata = ObjectMetadata()
@@ -30,6 +31,6 @@ class BucketFileHelper(
 			throw ErrorCd.INTERNAL_SERVER_ERROR.serviceException("file upload failed")
 		}
 
-		return "${baseUrl}/${bucket}/${objectRequest.key}"
+		return "${resourceLocation}/${objectRequest.key}"
 	}
 }

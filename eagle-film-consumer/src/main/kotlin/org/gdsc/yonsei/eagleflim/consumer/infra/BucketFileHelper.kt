@@ -14,6 +14,7 @@ class BucketFileHelper(
 	private val amazonS3: AmazonS3,
 	@Value("\${cloud.aws.credentials.bucket}") val bucket: String,
 	@Value("\${cloud.aws.s3.endpoint}") val baseUrl: String,
+	@Value("\${cloud.aws.s3.rl}") val resourceLocation: String
 ) {
 	fun uploadFile(fileName: String, byteArray: ByteArray): String {
 		val objectMetadata = ObjectMetadata()
@@ -30,7 +31,7 @@ class BucketFileHelper(
 			throw error("file upload failed")
 		}
 
-		return "${baseUrl}/${bucket}/${objectRequest.key}"
+		return "${resourceLocation}/${objectRequest.key}"
 	}
 
 	fun downloadFile(fileName: String): String {
