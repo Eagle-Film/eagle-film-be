@@ -2,6 +2,7 @@ package org.gdsc.yonsei.eagleflim.api.config.mvc
 
 import org.gdsc.yonsei.eagleflim.api.interceptor.JwtInterceptor
 import org.gdsc.yonsei.eagleflim.api.resolver.EagleUserArgumentResolver
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.format.FormatterRegistry
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
@@ -12,7 +13,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 open class WebConfig(
 	private val eagleUserArgumentResolver: EagleUserArgumentResolver,
-	private val jwtInterceptor: JwtInterceptor
+	private val jwtInterceptor: JwtInterceptor,
+	@Value("\${cors.allowed}") private val allowedOrigin: String,
 ) : WebMvcConfigurer {
 	override fun addFormatters(registry: FormatterRegistry) {
 		super.addFormatters(registry)
@@ -32,9 +34,10 @@ open class WebConfig(
 	}
 
 	override fun addCorsMappings(registry: CorsRegistry) {
-		// TODO: 개발 과정에서만 전체 해제. 이후에는 CORS 예외 규칙을 완전히 제거함.
+		val allowedOriginList = allowedOrigin.split(", ")
+
 		registry.addMapping("/**")
-			.allowedOriginPatterns("*")
+			.allowedOriginPatterns(*allowedOriginList.toTypedArray())
 			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 			.allowCredentials(true)
 			.maxAge(3600L)

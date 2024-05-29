@@ -2,6 +2,7 @@ package org.gdsc.yonsei.eagleflim.consumer.controller
 
 import org.gdsc.yonsei.eagleflim.common.entity.PhotoRequest
 import org.gdsc.yonsei.eagleflim.common.entity.User
+import org.gdsc.yonsei.eagleflim.common.model.factory.PhotoRequestInfoFactory
 import org.gdsc.yonsei.eagleflim.consumer.controller.model.*
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.UserRepository
@@ -47,15 +48,15 @@ class ManageController(
 				user -> return@let userService.getUser(user)
 			}
 
-			return@map NodeStatusOutput(it, requestInfo, userInfo)
+			return@map NodeStatusOutput(it, requestInfo?. let {PhotoRequestInfoFactory.simpleOfEntry(requestInfo)}, userInfo)
 		}
 	}
 
 	@GetMapping("/searchRequest")
 	fun searchRequest(@RequestParam requestId: String = ""): RequestUserInfoOutput {
 		val request = requestRepository.selectOneRequest(requestId) ?: return RequestUserInfoOutput(null, null)
-		val user = userService.getUser(request.userId) ?: return RequestUserInfoOutput(request, null)
-		return RequestUserInfoOutput(request, user)
+		val user = userService.getUser(request.userId) ?: return RequestUserInfoOutput(PhotoRequestInfoFactory.simpleOfEntry(request), null)
+		return RequestUserInfoOutput(PhotoRequestInfoFactory.simpleOfEntry(request), user)
 	}
 
 	@PostMapping("/deleteUser")
