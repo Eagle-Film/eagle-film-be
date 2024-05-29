@@ -45,9 +45,10 @@ class NodeInvoker(
 
 	private fun <T> invoke(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, urlParam: MultiValueMap<String, String>?, type: ParameterizedTypeReference<T>): T? {
 		val uri = urlParam?.let { baseUrl + "/" + UriComponentsBuilder.fromUriString(nodeCommand.location).queryParams(it).toUriString() } ?: ("$baseUrl/${nodeCommand.location}")
+		val protocol = if (uri.endsWith("443")) "https://" else "http://"
 
 		var requestSpec = nodeRestClient.method(nodeCommand.httpMethod)
-			.uri("http://" + uri)
+			.uri(protocol + uri)
 			.contentType(MediaType.APPLICATION_JSON)
 
 		param?.let {
