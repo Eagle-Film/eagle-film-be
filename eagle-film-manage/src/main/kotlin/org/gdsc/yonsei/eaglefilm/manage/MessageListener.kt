@@ -2,11 +2,13 @@ package org.gdsc.yonsei.eaglefilm.manage
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
 class MessageListener(
-	val consumerInvoker: ConsumerInvoker
+	val consumerInvoker: ConsumerInvoker,
+	@Value("\${discord.channel}") val channelName: String
 ): ListenerAdapter() {
 	override fun onMessageReceived(event: MessageReceivedEvent) {
 		if (event.author.isBot) {
@@ -16,6 +18,10 @@ class MessageListener(
 		val message = event.message
 		val content = message.contentRaw
 		val channel = event.channel
+
+		if (channel.name != channelName) {
+			return
+		}
 
 		when {
 			content == "!help" -> channel.sendMessage("""
