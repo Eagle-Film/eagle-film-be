@@ -42,3 +42,7 @@ noti:
 
 cors:
     allowed: "*"
+
+bg:
+    token: ${EAGLE_FILM_BG_TOKEN}
+    url: ${EAGLE_FILM_BG_URL}

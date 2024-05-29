@@ -77,20 +77,7 @@ class NodeInvoker(
 
 	companion object {
 		val nodeRestClient: RestClient = RestClient.builder()
-//			.requestInterceptor(clientHttpRequestInterceptor())
 			.build()
-
-//		private fun clientHttpRequestInterceptor(): ClientHttpRequestInterceptor {
-//			return ClientHttpRequestInterceptor { request: HttpRequest?, body: ByteArray?, execution: ClientHttpRequestExecution ->
-//				val retryTemplate = RetryTemplate()
-//				retryTemplate.setRetryPolicy(SimpleRetryPolicy(3))
-//				try {
-//					return@ClientHttpRequestInterceptor retryTemplate.execute<ClientHttpResponse, IOException> { _ : RetryContext? -> execution.execute(request, body) }
-//				} catch (throwable: Throwable) {
-//					throw RuntimeException(throwable)
-//				}
-//			}
-//		}
 
 		val logger: Logger = LoggerFactory.getLogger(NodeInvoker::class.java)
 	}
