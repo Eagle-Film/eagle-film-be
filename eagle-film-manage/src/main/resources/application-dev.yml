@@ -5,3 +5,6 @@ discord:
     channel: ${EAGLE_FILM_DISCORD_CHANNEL}
 consumer:
     address: ${EAGLE_FILM_CONSUMER_ADDRESS}
+bg:
+    token: ${EAGLE_FILM_BG_TOKEN}
+    url: ${EAGLE_FILM_BG_URL}

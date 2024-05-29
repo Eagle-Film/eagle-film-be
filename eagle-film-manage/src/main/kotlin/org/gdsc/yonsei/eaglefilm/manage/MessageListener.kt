@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class MessageListener(
 	val consumerInvoker: ConsumerInvoker,
+	val bgInvoker: BgInvoker,
 	@Value("\${discord.channel}") val channelName: String
 ): ListenerAdapter() {
 	override fun onMessageReceived(event: MessageReceivedEvent) {
@@ -19,7 +20,7 @@ class MessageListener(
 		val content = message.contentRaw
 		val channel = event.channel
 
-		if (channel.name != channelName) {
+		if (channel.id != channelName) {
 			return
 		}
 
@@ -120,6 +121,11 @@ class MessageListener(
 				}
 				val requestId = content.split(" ")[1]
 				val result = consumerInvoker.searchRequest(requestId)
+				channel.sendMessage(result.toString()).queue()
+			}
+
+			content == "!bgInfo" -> {
+				val result = bgInvoker.getParam()
 				channel.sendMessage(result.toString()).queue()
 			}
 		}
