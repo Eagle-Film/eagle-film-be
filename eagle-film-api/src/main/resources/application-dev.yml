@@ -24,7 +24,7 @@ mongodb:
 oauth:
     kakao:
         clientCode: e60282fe069d1c422ec1078ee4a29929
-        redirectUri: https://beta.eaglefilm.photo/kakao-token
+        redirectUri: https://eaglefilm.photo/kakao-token
 
 cloud:
     aws:
