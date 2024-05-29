@@ -58,6 +58,10 @@ class ConsumerInvoker(
 		return invoke(ConsumerCommand.SEARCH_REQUEST, null, requestParam, object : ParameterizedTypeReference<Map<String, Any>>() {}) ?: mapOf()
 	}
 
+	fun selectDeleteList(): List<String> {
+		return invoke(ConsumerCommand.SEARCH_DELETE_LIST, null, null, object : ParameterizedTypeReference<List<String>>() {}) ?: listOf()
+	}
+
 	fun <T> invoke(consumerCommand: ConsumerCommand, bodyParam: Map<String, Any>?, requestParam: MultiValueMap<String, String>?, type: ParameterizedTypeReference<T>): T? {
 		val uri = requestParam?.let { baseUrl + "/" + UriComponentsBuilder.fromUriString(consumerCommand.location).queryParams(it).toUriString() } ?: ("$baseUrl/${consumerCommand.location}")
 
@@ -97,4 +101,5 @@ enum class ConsumerCommand(
 	SEARCH_REQUEST("consumer/v1/manage/searchRequest", HttpMethod.GET),
 	SEARCH_USER("consumer/v1/manage/search", HttpMethod.POST),
 	REASSIGN_JOB("consumer/v1/manage/reassignJob", HttpMethod.POST),
+	SEARCH_DELETE_LIST("consumer/v1/manage/deleteList", HttpMethod.GET)
 }

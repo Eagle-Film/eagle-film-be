@@ -22,8 +22,11 @@ class NodeService(
 	}
 
 	fun removeNode(address: String) {
-		if (!nodeRepository.checkNode(address)) {
-			error("node not exist")
+		val nodeInfo = nodeRepository.getNodeInfo(address) ?: error("node not exist")
+
+		if (nodeInfo.assignedRequest != null) {
+			nodeRepository.insertDeleteQueue(address)
+			return
 		}
 
 		nodeRepository.removeNode(address)

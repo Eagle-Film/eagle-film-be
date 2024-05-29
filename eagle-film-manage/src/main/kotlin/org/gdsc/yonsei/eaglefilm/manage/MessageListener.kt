@@ -37,6 +37,8 @@ class MessageListener(
 				!deleteUser (userId): 해당 유저를 제거합니다.
 				!reassignJob (requestId): 실패한 요청을 다시 재시작 합니다. (Queue에 재 할당, 우선순위는 미뤄짐)
 				!searchRequest (requestId): 요청 정보를 가져옵니다.
+				!bgInfo: 이미지 누끼 API의 정보를 가져옵니다.
+				!deleteWaitingNodeList: 노드 삭제 대기 목록을 가져옵니다.
 			""".trimIndent()).queue()
 
 			content == "!ping" -> channel.sendMessage("뽕~").queue()
@@ -126,6 +128,11 @@ class MessageListener(
 
 			content == "!bgInfo" -> {
 				val result = bgInvoker.getParam()
+				channel.sendMessage(result.toString()).queue()
+			}
+
+			content == "!deleteWaitingNodeList" || content == "!wnl" -> {
+				val result = consumerInvoker.selectDeleteList()
 				channel.sendMessage(result.toString()).queue()
 			}
 		}

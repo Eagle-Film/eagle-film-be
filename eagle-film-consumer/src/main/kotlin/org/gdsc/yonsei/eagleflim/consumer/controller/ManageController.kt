@@ -4,6 +4,7 @@ import org.gdsc.yonsei.eagleflim.common.entity.User
 import org.gdsc.yonsei.eagleflim.common.model.SimplePhotoRequestInfo
 import org.gdsc.yonsei.eagleflim.common.model.factory.PhotoRequestInfoFactory
 import org.gdsc.yonsei.eagleflim.consumer.controller.model.*
+import org.gdsc.yonsei.eagleflim.consumer.repository.NodeRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.UserRepository
 import org.gdsc.yonsei.eagleflim.consumer.service.NodeService
@@ -17,6 +18,7 @@ class ManageController(
 	private val nodeService: NodeService,
 	private val userService: UserService,
 	private val requestService: PhotoRequestService,
+	private val nodeRepository: NodeRepository,
 	private val requestRepository: RequestRepository,
 	private val userRepository: UserRepository
 ) {
@@ -65,5 +67,10 @@ class ManageController(
 	@PostMapping("/reassignJob")
 	fun reassignJob(@RequestBody jobInput: ReassignJobInput) {
 		requestService.retryRequest(jobInput.requestId)
+	}
+
+	@GetMapping("/deleteList")
+	fun deleteList(): List<String> {
+		return nodeRepository.selectAllDeleteQueue()
 	}
 }

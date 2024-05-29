@@ -22,7 +22,8 @@ class PhotoRequestService(
 	private val userRepository: UserRepository,
 	private val nodeInvoker: NodeInvoker,
 	private val notiService: NotiService,
-	private val bucketFileHelper: BucketFileHelper
+	private val bucketFileHelper: BucketFileHelper,
+	private val nodeService: NodeService
 ) {
 	fun assignRequest(requestId: String, nodeUrl: String) {
 		val request = requestRepository.selectOneRequest(requestId) ?: error("Request with requestId $requestId not found")
@@ -53,6 +54,11 @@ class PhotoRequestService(
 
 		// TODO: Web Push Noti
 		notiService.sendNoti(request.userId)
+
+		if (nodeRepository.checkDeleteQueue(nodeUrl)) {
+			nodeRepository.removeDeleteQueue(nodeUrl)
+			nodeService.removeNode(nodeUrl)
+		}
 	}
 
 	private fun saveImage(userId: String, imageStatus: ImageStatus, resultImage: String? = null, resultImageByte: ByteArray? = null): Photo {
