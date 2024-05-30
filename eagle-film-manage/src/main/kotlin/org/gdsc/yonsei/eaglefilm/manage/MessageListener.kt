@@ -135,6 +135,14 @@ class MessageListener(
 				val result = consumerInvoker.selectDeleteList()
 				channel.sendMessage(result.toString()).queue()
 			}
+
+			content == "!alarmOn" -> {
+				SchedulingDiscordMessageSender.scheduleOn = true
+			}
+
+			content == "!alarmOff" -> {
+				SchedulingDiscordMessageSender.scheduleOn = false
+			}
 		}
 	}
 }

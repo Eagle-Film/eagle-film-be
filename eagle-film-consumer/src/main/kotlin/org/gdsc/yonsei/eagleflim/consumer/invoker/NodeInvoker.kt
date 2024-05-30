@@ -9,6 +9,7 @@ import org.gdsc.yonsei.eagleflim.consumer.model.NodeIdleInfo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -20,7 +21,7 @@ import java.io.BufferedReader
 import java.io.InputStream
 
 @Component
-class NodeInvoker(
+open class NodeInvoker(
 	private val discordInvoker: DiscordInvoker,
 ) {
 	fun checkIdle(nodeUrl: String): Boolean {
@@ -43,7 +44,16 @@ class NodeInvoker(
 		invoke(nodeUrl, NodeCommand.INFER_REQUEST, param, null, object : ParameterizedTypeReference<Unit>() { })
 	}
 
-	private fun <T> invoke(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, urlParam: MultiValueMap<String, String>?, type: ParameterizedTypeReference<T>): T? {
+	fun <T> invoke(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, urlParam: MultiValueMap<String, String>?, type: ParameterizedTypeReference<T>): T? {
+		try {
+			return invokeInner(baseUrl, nodeCommand, param, urlParam, type)
+		} catch (e: HttpInvokerException) {
+			discordInvoker.sendMessage(DiscordMessageUtil.createNodeInternalServerMessage(baseUrl))
+			throw e
+		}
+	}
+
+	fun <T> invokeInner(baseUrl: String, nodeCommand: NodeCommand, param: Map<String, Any>?, urlParam: MultiValueMap<String, String>?, type: ParameterizedTypeReference<T>): T? {
 		val uri = urlParam?.let { baseUrl + "/" + UriComponentsBuilder.fromUriString(nodeCommand.location).queryParams(it).toUriString() } ?: ("$baseUrl/${nodeCommand.location}")
 		val protocol = if (uri.contains("443")) "https://" else "http://"
 
@@ -55,21 +65,34 @@ class NodeInvoker(
 			requestSpec = requestSpec.body(it)
 		}
 
-		val result = requestSpec
-			.retrieve()
-			.onStatus(HttpStatusCode::is4xxClientError) {
-				_, response -> throw HttpInvokerException(response.statusCode, nodeCommand.location, param)
-			}
-			.onStatus(HttpStatusCode::is5xxServerError) {
-				_, response -> run {
-					logger.error("[NodeInvoker] API Call Failed. statusCode: {}, body: {}", response.statusCode, readBody(response.body))
-					discordInvoker.sendMessage(DiscordMessageUtil.createNodeInternalServerMessage(baseUrl))
-				}
-			}
-			.body(type)
+		(1..3).forEach {
+			try {
+				val result = requestSpec
+					.retrieve().onStatus(HttpStatusCode::is4xxClientError) { _, response ->
+						run {
+							logger.warn("API Call Failed - baseUrl: {}, nodeCommand: {}, statusCode: {}, body: {}", baseUrl, nodeCommand, response.statusCode, response.body)
+							throw HttpInvokerException(response.statusCode, nodeCommand.location, param)
+						}
+					}
+					.onStatus(HttpStatusCode::is5xxServerError) { _, response ->
+						run {
+							logger.warn("API Call Failed - baseUrl: {}, nodeCommand: {}, statusCode: {}, body: {}", baseUrl, nodeCommand, response.statusCode, response.body)
+							throw HttpInvokerException(response.statusCode, nodeCommand.location, param)
+						}
+					}
+					.body(type)
 
-		logger.info("[NodeInvoker] API Call - baseUrl: {}, param: {}, nodeCommand: {}, result: {}", baseUrl, if (nodeCommand == NodeCommand.INFER_REQUEST) null else param, nodeCommand, if (nodeCommand == NodeCommand.CHECK_FINISH) "SKIP" else result)
-		return result
+				logger.info("[NodeInvoker] API Call - baseUrl: {}, param: {}, nodeCommand: {}, result: {}", baseUrl, if (nodeCommand == NodeCommand.INFER_REQUEST) null else param, nodeCommand, if (nodeCommand == NodeCommand.CHECK_FINISH) "SKIP" else result)
+				return result
+			} catch (e: Exception) {
+				if (it == 3) {
+					throw e
+				}
+				Thread.sleep(300)
+			}
+		}
+
+		throw HttpInvokerException(HttpStatus.INTERNAL_SERVER_ERROR, nodeCommand.location, param)
 	}
 
 	private fun readBody(body: InputStream): String {

@@ -15,7 +15,7 @@ class DiscordConfig(
 	@Value("\${discord.token}") private val discordToken: String,
 	messageListener: MessageListener
 ) {
-	private var jda: JDA? = null
+	var jda: JDA? = null
 
 	init {
 		jda = JDABuilder.createDefault(discordToken, GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_VOICE_STATES)

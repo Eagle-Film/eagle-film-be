@@ -4,6 +4,7 @@ import org.gdsc.yonsei.eagleflim.common.entity.User
 import org.gdsc.yonsei.eagleflim.common.model.SimplePhotoRequestInfo
 import org.gdsc.yonsei.eagleflim.common.model.factory.PhotoRequestInfoFactory
 import org.gdsc.yonsei.eagleflim.consumer.controller.model.*
+import org.gdsc.yonsei.eagleflim.consumer.model.NodeInfo
 import org.gdsc.yonsei.eagleflim.consumer.repository.NodeRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.RequestRepository
 import org.gdsc.yonsei.eagleflim.consumer.repository.UserRepository
@@ -33,11 +34,8 @@ class ManageController(
 	}
 
 	@GetMapping("/status")
-	fun scan(): List<NodeStatusOutput> {
-		val nodeStatusList = nodeService.getAllNodeStatus()
-		return nodeStatusList.map {
-			return@map NodeStatusOutput(it, it.assignedRequest)
-		}
+	fun scan(): List<NodeInfo> {
+		return nodeService.getAllNodeStatus()
 	}
 
 	@GetMapping("/searchRequest")

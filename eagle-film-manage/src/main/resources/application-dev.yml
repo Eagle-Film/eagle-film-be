@@ -3,6 +3,7 @@ server:
 discord:
     token: ${EAGLE_FILM_DISCORD_TOKEN}
     channel: ${EAGLE_FILM_DISCORD_CHANNEL}
+    alarmChannel: ${EAGLE_FILM_DISCORD_ALARM}
 consumer:
     address: ${EAGLE_FILM_CONSUMER_ADDRESS}
 bg:
