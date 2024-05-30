@@ -138,10 +138,12 @@ class MessageListener(
 
 			content == "!alarmOn" -> {
 				SchedulingDiscordMessageSender.scheduleOn = true
+				channel.sendMessage("OK").queue()
 			}
 
 			content == "!alarmOff" -> {
 				SchedulingDiscordMessageSender.scheduleOn = false
+				channel.sendMessage("OK").queue()
 			}
 		}
 	}
